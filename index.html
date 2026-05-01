@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAGI × Melbourne Design Week 2026</title>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:              #0a0a0a;
+      --white:              #fff;
+      --line:               #c8c8c8;
+      --line-mid:           #d8d8d8;
+      --muted:              #555;
+      --dim:                #777;
+      --col-research:       #c8e800;
+      --col-animation:      #ff20c0;
+      --col-games:          #1eceff;
+      --col-interactivity:  #ff6b1a;
+      --mdw-red:            #c0001c;
+    }
+
+    html, body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Satoshi', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.6;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      border-bottom: 1px solid var(--line);
+      padding: 0 24px;
+      background: var(--white);
+      position: relative;
+      z-index: 200;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-magi {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .nav-x {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--line-mid);
+      letter-spacing: 0;
+    }
+
+    .nav-mdw {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .nav-collab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--mdw-red);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .nav-back {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--black); }
+
+    /* ── STAGE ───────────────────────────────────── */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 540px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Subtle noise texture overlay */
+    .stage::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255,255,255,0) 40%, rgba(240,240,240,0.25) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── FLOATING CARDS ──────────────────────────── */
+    .floating-card {
+      position: absolute;
+      width: 240px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 3;
+      transition: opacity 0.5s ease, box-shadow 0.35s ease;
+      will-change: opacity;
+    }
+    .floating-card.swapping {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .floating-card.card-dim {
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    /* Hover lift */
+    .floating-card:hover {
+      box-shadow: 0 18px 48px rgba(0,0,0,0.15);
+      z-index: 20;
+    }
+
+    /* Animations only — positions set by JS */
+    .card-1 { animation: float1 7s   ease-in-out infinite; }
+    .card-2 { animation: float2 8.5s ease-in-out infinite; }
+    .card-3 { animation: float3 9s   ease-in-out infinite; }
+    .card-4 { animation: float4 7.5s ease-in-out infinite; }
+
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-13px); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-17px); }
+    }
+    @keyframes float3 {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-11px); }
+    }
+    @keyframes float4 {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-15px); }
+    }
+
+    /* ── Ghost / background depth cards ─────────── */
+    .ghost-card {
+      pointer-events: none !important;
+      cursor: default;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transition: opacity 0.9s ease;
+    }
+    .ghost-card:hover { box-shadow: none; }
+
+    /* Depth tiers — opacity + z-index only; scale lives in keyframes */
+    .ghost-near { opacity: 0.14; z-index: 2; }
+    .ghost-mid  { opacity: 0.07; z-index: 1; }
+    .ghost-far  { opacity: 0.03; z-index: 0; }
+
+    @keyframes ghostNearFloat {
+      0%   { transform: scale(0.72) translateY(0px);  }
+      100% { transform: scale(0.72) translateY(-9px); }
+    }
+    @keyframes ghostMidFloat {
+      0%   { transform: scale(0.56) translateY(0px);  }
+      100% { transform: scale(0.56) translateY(-6px); }
+    }
+    @keyframes ghostFarFloat {
+      0%   { transform: scale(0.40) translateY(0px);  }
+      100% { transform: scale(0.40) translateY(-4px); }
+    }
+
+    /* Search state modifiers */
+    .floating-card.card-dim {
+      opacity: 0.12;
+      pointer-events: none;
+    }
+    .floating-card.card-highlight {
+      animation-play-state: paused;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      z-index: 15;
+    }
+
+    /* ── CARD INTERNALS ──────────────────────────── */
+    .fc-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #f0f0f0;
+      position: relative;
+    }
+    .fc-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .floating-card:hover .fc-thumb img {
+      transform: scale(1.04);
+    }
+
+    /* Gradient fade from image into card body */
+    .fc-thumb::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 35%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.82) 100%);
+      pointer-events: none;
+    }
+
+    .fc-body {
+      padding: 6px 12px 13px;
+    }
+
+    /* On floating cards, hide everything except the artist name */
+    .floating-card .fc-spec,
+    .floating-card .fc-title,
+    .floating-card .fc-tags,
+    .floating-card .fc-link { display: none !important; }
+
+    .fc-spec {
+      display: inline-block;
+      font-size: 8.5px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-bottom: 6px;
+    }
+    .fc-spec-research       { background: var(--col-research);       color: #404a00; }
+    .fc-spec-animation      { background: var(--col-animation);      color: #fff; }
+    .fc-spec-games          { background: var(--col-games);          color: #003340; }
+    .fc-spec-interactivity  { background: var(--col-interactivity);  color: #fff; }
+
+    .fc-title {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      color: var(--black);
+    }
+
+    .fc-student {
+      font-size: 10px;
+      font-weight: 300;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 0;
+    }
+
+    .fc-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .fc-tag {
+      font-size: 8px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border: 1px solid var(--line-mid);
+      border-radius: 3px;
+      color: var(--muted);
+    }
+
+    .fc-link {
+      font-size: 9.5px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.15s;
+    }
+    .fc-link:hover { color: var(--black); }
+
+    /* ── STAGE CENTER ────────────────────────────── */
+    .stage-center {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      pointer-events: none;
+    }
+
+    .stage-logo {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      user-select: none;
+    }
+    .stage-logo img {
+      height: 100px;
+      width: auto;
+      display: block;
+    }
+
+    /* ── SEARCH ──────────────────────────────────── */
+    .search-wrap {
+      pointer-events: all;
+      position: relative;
+      width: 310px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 13px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      height: 42px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 100px;
+      padding: 0 18px 0 38px;
+      font-family: 'Satoshi', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--black);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+    .search-input::placeholder { color: var(--muted); }
+
+    .search-hint {
+      font-size: 9.5px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin-top: -6px;
+    }
+    .search-hint span {
+      color: var(--dim);
+      border-bottom: 1px dashed var(--line-mid);
+      cursor: default;
+    }
+
+    /* ── MDW LOGO ────────────────────────────────── */
+    .mdw-logo-img {
+      pointer-events: all;
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+
+    /* ── FOOTER STRIP ────────────────────────────── */
+    .footer-strip {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      border-top: 1px solid var(--line);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 200;
+    }
+    .footer-strip-left,
+    .footer-strip-right {
+      font-size: 9.5px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .footer-strip-right { color: var(--mdw-red); }
+
+    /* ── COLLAB LABEL ────────────────────────────── */
+    .collab-label {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+
+    /* ── MODAL ───────────────────────────────────────── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.72);
+      backdrop-filter: blur(6px);
+      z-index: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-box {
+      background: var(--white);
+      border-radius: 18px;
+      overflow: hidden;
+      width: 520px;
+      max-width: 92vw;
+      max-height: 88vh;
+      overflow-y: auto;
+      position: relative;
+      transform: translateY(22px) scale(0.97);
+      transition: transform 0.35s ease;
+    }
+    .modal-backdrop.open .modal-box {
+      transform: translateY(0) scale(1);
+    }
+    .modal-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+    .modal-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-body {
+      padding: 22px 26px 32px;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.25;
+      margin: 8px 0 6px;
+      color: var(--black);
+    }
+    .modal-student {
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--dim);
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      font-size: 17px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--black);
+      z-index: 10;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: #fff; }
+
+    /* ── MODAL AVATARS ──────────────────────────────── */
+    .modal-avatar-wrap {
+      position: fixed;
+      z-index: 650;
+      pointer-events: all;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .modal-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 2px solid var(--line);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: opacity 0.45s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .modal-avatar-wrap:hover .modal-avatar {
+      transform: scale(1.08);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+    }
+    .modal-avatar.visible { opacity: 1; }
+    .modal-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .avatar-name {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .avatar-name.visible { opacity: 1; }
+
+    .av-float-1 { animation: avFloat1 5s   ease-in-out infinite; }
+    .av-float-2 { animation: avFloat2 6.5s ease-in-out infinite; }
+    .av-float-3 { animation: avFloat3 7s   ease-in-out infinite; }
+    .av-float-4 { animation: avFloat4 5.5s ease-in-out infinite; }
+    .av-float-5 { animation: avFloat1 8s   ease-in-out infinite; }
+    .av-float-6 { animation: avFloat3 6s   ease-in-out infinite; }
+
+    @keyframes avFloat1 { 0%,100% { transform: translateY(0px);   } 50% { transform: translateY(-10px); } }
+    @keyframes avFloat2 { 0%,100% { transform: translateY(0px);   } 50% { transform: translateY(-14px); } }
+    @keyframes avFloat3 { 0%,100% { transform: translateY(0px);   } 50% { transform: translateY(-8px);  } }
+    @keyframes avFloat4 { 0%,100% { transform: translateY(0px);   } 50% { transform: translateY(-12px); } }
+
+    /* ── ARTIST BIO CARD ────────────────────────────── */
+    .artist-bio {
+      position: fixed;
+      z-index: 700;
+      width: 240px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 18px 20px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+      opacity: 0;
+      transform: scale(0.94) translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: all;
+    }
+    .artist-bio.open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .bio-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.15s;
+    }
+    .bio-close:hover { background: #f0f0f0; }
+    .bio-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      border: 1.5px solid var(--line);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .bio-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bio-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 2px;
+    }
+    .bio-role {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .bio-text {
+      font-size: 11.5px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--dim);
+    }
+
+    /* ── OUTER RING ──────────────────────────────── */
+    .outer-ring-card {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f0f0f0;
+      border: 1px solid rgba(0,0,0,0.06);
+      /* opacity set per-card by JS */
+      transition: opacity 0.6s ease;
+    }
+    .outer-ring-card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── MOBILE ──────────────────────────────────── */
+    @media (max-width: 600px) {
+
+      /* Smaller cards */
+      .floating-card { width: 155px; }
+
+      /* Shrink logo so orbit has room */
+      .stage-logo img { height: 60px; }
+
+      /* Search bar fills available width */
+      .search-wrap { width: calc(100vw - 40px); max-width: 310px; }
+
+      /* Hide ghost and outer-ring cards — too cluttered at small sizes */
+      .ghost-card       { display: none !important; }
+      .outer-ring-card  { display: none !important; }
+
+      /* Smaller avatars around the modal */
+      .modal-avatar { width: 60px; height: 60px; }
+      .avatar-name  { font-size: 9px; }
+
+      /* Bio card respects screen edges */
+      .artist-bio { width: calc(100vw - 32px); max-width: 240px; }
+
+      /* Footer stays readable */
+      .footer-strip { padding: 0 14px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ── STAGE ──────────────────────────────────────── -->
+  <section class="stage">
+
+    <!-- Card 1 — Research -->
+    <div class="floating-card card-1"
+         data-spec="research"
+         data-search="nature influence environment motion ecology research alex nguyen">
+      <div class="fc-thumb">
+        <img src="media/s4210724-natures-influence.webp" alt="Nature's Influence" />
+      </div>
+      <div class="fc-body">
+        <div class="fc-spec fc-spec-research">Research</div>
+        <div class="fc-title">Nature's Influence</div>
+        <div class="fc-student">Alex Nguyen — 2026</div>
+        <div class="fc-tags">
+          <span class="fc-tag">Ecology</span>
+          <span class="fc-tag">Motion</span>
+          <span class="fc-tag">Critical</span>
+        </div>
+        <a class="fc-link" href="#">View work ›</a>
+      </div>
+    </div>
+
+    <!-- Card 2 — Animation -->
+    <div class="floating-card card-2"
+         data-spec="animation"
+         data-search="love egg animation narrative 2d character maya santos">
+      <div class="fc-thumb">
+        <img src="media/s4017090-love-in-the-form-of-an-egg.webp" alt="Love in the Form of an Egg" />
+      </div>
+      <div class="fc-body">
+        <div class="fc-spec fc-spec-animation">Animation</div>
+        <div class="fc-title">Love in the Form of an Egg</div>
+        <div class="fc-student">Maya Santos — 2026</div>
+        <div class="fc-tags">
+          <span class="fc-tag">Narrative</span>
+          <span class="fc-tag">2D</span>
+          <span class="fc-tag">Character</span>
+        </div>
+        <a class="fc-link" href="#">View work ›</a>
+      </div>
+    </div>
+
+    <!-- Card 3 — Games -->
+    <div class="floating-card card-3"
+         data-spec="games"
+         data-search="remnants days games unity hdrp websocket critical design james park">
+      <div class="fc-thumb">
+        <img src="media/s3634079-remnants-of-our-days.webp" alt="Remnants of Our Days" />
+      </div>
+      <div class="fc-body">
+        <div class="fc-spec fc-spec-games">Games</div>
+        <div class="fc-title">Remnants of Our Days</div>
+        <div class="fc-student">James Park — 2026</div>
+        <div class="fc-tags">
+          <span class="fc-tag">Unity</span>
+          <span class="fc-tag">Critical</span>
+          <span class="fc-tag">World</span>
+        </div>
+        <a class="fc-link" href="#">View work ›</a>
+      </div>
+    </div>
+
+    <!-- Card 4 — Interactivity -->
+    <div class="floating-card card-4"
+         data-spec="interactivity"
+         data-search="mind tilt interactivity installation physical computing sensor sara chen">
+      <div class="fc-thumb">
+        <img src="media/s4148738-mind-tilt.webp" alt="Mind Tilt" />
+      </div>
+      <div class="fc-body">
+        <div class="fc-spec fc-spec-interactivity">Interactivity</div>
+        <div class="fc-title">Mind Tilt</div>
+        <div class="fc-student">Sara Chen — 2026</div>
+        <div class="fc-tags">
+          <span class="fc-tag">Installation</span>
+          <span class="fc-tag">Sensor</span>
+          <span class="fc-tag">Body</span>
+        </div>
+        <a class="fc-link" href="#">View work ›</a>
+      </div>
+    </div>
+
+    <!-- ── CENTER ─────────────────────────────────── -->
+    <div class="stage-center">
+
+      <!-- MAGI logo using individual letter PNGs -->
+      <div class="stage-logo">
+        <img src="logo/M-logo.png" alt="M" />
+        <img src="logo/A-logo.png" alt="A" />
+        <img src="logo/G-logo.png" alt="G" />
+        <img src="logo/I-logo.png" alt="I" />
+      </div>
+
+      <!-- Search bar -->
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none"
+             stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <circle cx="6.5" cy="6.5" r="4.5"/>
+          <line x1="10.2" y1="10.2" x2="14" y2="14"/>
+        </svg>
+        <input
+          class="search-input"
+          type="text"
+          id="searchInput"
+          placeholder="Search works, mediums, themes…"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="search-hint">
+        try:
+        <span>animation</span> &nbsp;
+        <span>installation</span> &nbsp;
+        <span>narrative</span>
+      </div>
+
+      <!-- MDW Logo -->
+      <img class="mdw-logo-img" src="logo/MDW logo.png" alt="Melbourne Design Week" />
+
+    </div><!-- /stage-center -->
+
+    <div class="collab-label">RMIT MAGI × Melbourne Design Week 2026</div>
+
+  </section>
+
+  <!-- ── MODAL ─────────────────────────────────────── -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-thumb"><img id="modalImg" src="" alt="" /></div>
+      <div class="modal-body">
+        <div class="fc-spec" id="modalSpec" style="display:none"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-student" id="modalStudent"></div>
+        <div class="fc-tags" id="modalTags"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCRIPTS ────────────────────────────────────── -->
+  <script>
+    /* ── Project data ── */
+    const PROJECTS = [
+      {
+        title: 'Not a Robot',
+        student: 'Zixin, Hilary, Lou, Gavin — 2026',
+        img: 'thumbnails/projects/Not a Robot .jpg',
+        tags: ['Motion Capture', 'Performance', 'Character'],
+        search: 'not a robot mocap performance character zixin hilary lou gavin',
+        artists: [
+          { name: 'Zixin Liang', photo: 'thumbnails/profiles/Not a Robot (Mocap)/Images/Zixin Liang Jessi_image.jpg', role: 'RMIT MAGI — 2026', bio: 'Zixin (Jessi) is a media artist working across motion capture and performance-based practice.' },
+          { name: 'Hilary Dodd', photo: 'thumbnails/profiles/Not a Robot (Mocap)/Images/HighRes_RMIT_FirstSiteArtistPortrait_HilaryDodd_4.jpg', role: 'RMIT MAGI — 2026', bio: 'Hilary is a multidisciplinary artist exploring the relationship between the body, technology, and choreography.' },
+          { name: 'Lou', photo: 'thumbnails/profiles/Not a Robot (Mocap)/Images/Lou.jpg', role: 'RMIT MAGI — 2026', bio: 'Lou is a designer and animator interested in embodied movement and the expressive potential of the human form.' },
+          { name: 'Gavin', photo: 'thumbnails/profiles/Not a Robot (Mocap)/Images/Gavin_image.jpg', role: 'RMIT MAGI — 2026', bio: 'Gavin works at the intersection of interactive media and physical performance, questioning what it means to move like a machine.' },
+        ]
+      },
+      {
+        title: 'BEEyond Sight',
+        student: 'Teesta, Da Long, Anjaly, Anjali — 2026',
+        img: 'thumbnails/projects/Beeyond Sight (Nova).png',
+        tags: ['Nova', 'Immersive', 'XR'],
+        search: 'beeyond sight nova immersive xr teesta dalong anjaly anjali',
+        artists: [
+          { name: 'Teesta Singh', photo: 'thumbnails/profiles/Beeyond Sight (Nova)/Teesta Singh.jpg', role: 'RMIT MAGI — 2026', bio: 'Teesta is an interactive media designer with a focus on immersive environments and sensory storytelling.' },
+          { name: 'Da Long Yee Lee', photo: 'thumbnails/profiles/Beeyond Sight (Nova)/dalong yee lee.jpeg', role: 'RMIT MAGI — 2026', bio: 'Da Long is a creative technologist exploring the intersections of perception, space, and extended reality.' },
+          { name: 'Anjaly Kalayil', photo: 'thumbnails/profiles/Beeyond Sight (Nova)/anjaly kalayil.png', role: 'RMIT MAGI — 2026', bio: 'Anjaly is a designer and researcher whose work investigates how technology shapes our understanding of the natural world.' },
+          { name: 'Anjali Joseph', photo: 'thumbnails/profiles/Beeyond Sight (Nova)/Anjali Joseph.jfif', role: 'RMIT MAGI — 2026', bio: 'Anjali is a media artist working with immersive installation to create empathetic, multi-sensory experiences.' },
+        ]
+      },
+      {
+        title: 'Look Away',
+        student: 'Andy, Zhuoer, Guanlei — 2026',
+        img: 'thumbnails/projects/Look away.jpg',
+        tags: ['Meta', 'XR', 'Interactive'],
+        search: 'look away meta xr interactive andy zhuoer guanlei',
+        artists: [
+          { name: 'Andy', photo: 'thumbnails/profiles/Look Away (Meta)/Andy.jpg', role: 'RMIT MAGI — 2026', bio: 'Andy is a new media artist exploring attention, gaze, and the politics of visibility through interactive installation.' },
+          { name: 'Zhuoer', photo: 'thumbnails/profiles/Look Away (Meta)/Zhuoer.jpg', role: 'RMIT MAGI — 2026', bio: 'Zhuoer works with mixed reality and spatial computing to question how we look — and choose not to look — at the world.' },
+          { name: 'Guanlei', photo: 'thumbnails/profiles/Look Away (Meta)/Guanlei/Guanlei.png', role: 'RMIT MAGI — 2026', bio: 'Guanlei is a designer and researcher interested in the phenomenology of digital presence and augmented perception.' },
+        ]
+      },
+      {
+        title: 'Infinite Bloom',
+        student: 'Kora, Doris, Thao — 2026',
+        img: 'thumbnails/projects/Infinite Bloom.jpg',
+        tags: ['Projection', 'Generative', 'Space'],
+        search: 'infinite bloom projection generative space kora doris thao',
+        artists: [
+          { name: 'Kora Lee', photo: 'thumbnails/profiles/Liminal -_ Infinite Bloom/Kora Lee.JPG', role: 'RMIT MAGI — 2026', bio: 'Kora is a media artist whose generative and projection-based work explores cycles of growth, decay, and regeneration.' },
+          { name: 'Doris', photo: 'thumbnails/profiles/Liminal -_ Infinite Bloom/Doris.PNG', role: 'RMIT MAGI — 2026', bio: 'Doris creates immersive visual environments that blur the line between the organic and the digital.' },
+          { name: 'Thao Tran', photo: 'thumbnails/profiles/Liminal -_ Infinite Bloom/Thao Tran.jpg', role: 'RMIT MAGI — 2026', bio: 'Thao is an artist and animator drawn to the meditative qualities of light, motion, and ephemeral natural systems.' },
+        ]
+      },
+      {
+        title: 'GESTURIA',
+        student: 'Sofia, Sunny, Adrian, Yun, Anjali — 2026',
+        img: 'thumbnails/projects/Gesturia.png',
+        tags: ['Gesture', 'Motion', 'Interactive'],
+        search: 'gesturia gesture motion interactive sofia sunny adrian yun anjali',
+        artists: [
+          { name: 'Sofia', photo: 'thumbnails/profiles/Gesturia/Sofia.jpg', role: 'RMIT MAGI — 2026', bio: 'Sofia is a creative practitioner whose work bridges gesture-based interaction and real-time visual systems.' },
+          { name: 'Son (Sunny)', photo: 'thumbnails/profiles/Gesturia/Sunny/IMG_7552_INFACE.png', role: 'RMIT MAGI — 2026', bio: 'Son (or Sunny) is an animator with a background of visual art and illustration. His interest of practice involves cinematography, character movement and FX animation. His works explored variety styles of movement that can be differently animated through experimentation and multimedium exploration.' },
+          { name: 'Adrian', photo: 'thumbnails/profiles/Gesturia/Adrian/Adrian.jpeg', role: 'RMIT MAGI — 2026', bio: 'Adrian is a designer and technologist building interactive systems that respond to human movement and spatial data.' },
+          { name: 'Yun', photo: 'thumbnails/profiles/Gesturia/Yun/截圖 2026-04-21 晚上9.12.45.png', role: 'RMIT MAGI — 2026', bio: 'Yun is a media designer with over 11 years of experience across animation, UIUX, and new media. She has worked on projection design for theater and concert productions touring cities such as Shanghai, Beijing, and Taiwan. Yun has collaborated with international teams in Japan, Singapore, and beyond, contributing to website design, video editing, and user interface development. Her cross-cultural experience has strengthened her communication, teamwork, and design adaptability. With a strong sensitivity to cultural diversity, Yun focuses on transforming global influences into thoughtful, effective design solutions that connect with diverse audiences.' },
+          { name: 'Anjali Durisheti', photo: 'thumbnails/profiles/Gesturia/Anjali/Anjali Durisheti.JPG', role: 'RMIT MAGI — 2026', bio: 'Anjali is a designer and interaction researcher whose practice explores embodied computing and culturally responsive design.' },
+        ]
+      },
+      {
+        title: 'Nova Rover',
+        student: 'Lexi, Rina, Girish, Yohan — 2026',
+        img: 'thumbnails/projects/Nova Rover.png',
+        tags: ['Nova', 'Simulation', 'Environment'],
+        search: 'nova rover simulation environment lexi rina girish yohan',
+        artists: [
+          { name: 'Lexi', photo: 'thumbnails/profiles/Nova Rover (Nova)/Lexi/Lexi.JPG', role: 'RMIT MAGI — 2026', bio: 'Lexi is a media designer and world-builder interested in speculative futures, robotics, and environmental simulation.' },
+          { name: 'Rina', photo: 'thumbnails/profiles/Nova Rover (Nova)/Rina/Rina.png', role: 'RMIT MAGI — 2026', bio: 'Rina works at the intersection of game design and interactive narrative, creating tactile environments that invite exploration.' },
+          { name: 'Girish', photo: 'thumbnails/profiles/Nova Rover (Nova)/Girish/Girish.jpg', role: 'RMIT MAGI — 2026', bio: 'Girish is a technical artist and real-time designer whose work spans procedural generation and interactive systems.' },
+          { name: 'Yohan D\'Souza', photo: 'thumbnails/profiles/Nova Rover (Nova)/Yohan/Yohan_Dsouza_s4110865_1x1.jpg', role: 'RMIT MAGI — 2026', bio: 'Yohan is a games artist focused on environment design and emergent gameplay mechanics in speculative settings.' },
+        ]
+      },
+      {
+        title: 'Symbiotic Echos',
+        student: 'Yujie, Xinyun, Erhan — 2026',
+        img: 'thumbnails/projects/Symbiotic Echos.png',
+        tags: ['Meta', 'Sound', 'Ecology'],
+        search: 'symbiotic echos meta sound ecology yujie xinyun erhan',
+        artists: [
+          { name: 'Yujie', photo: 'thumbnails/profiles/Symbiotic Echos (Meta)/Yujie/Yujie.JPG', role: 'RMIT MAGI — 2026', bio: 'Yujie is a sound and media artist whose practice investigates acoustic ecology and the invisible relationships between living systems.' },
+          { name: 'Xinyun', photo: 'thumbnails/profiles/Symbiotic Echos (Meta)/Xinyun/Xinyun.jpeg', role: 'RMIT MAGI — 2026', bio: 'Xinyun is an interdisciplinary designer working with immersive audio-visual installations that highlight ecological interdependence.' },
+          { name: 'Erhan', photo: 'thumbnails/profiles/Symbiotic Echos (Meta)/Erhan/Erhan.png', role: 'RMIT MAGI — 2026', bio: 'Erhan is a media artist and technologist whose work explores the entanglement of digital systems and natural environments.' },
+        ]
+      },
+      {
+        title: 'Form',
+        student: 'Josephine, Wenhao, Nguyen — 2026',
+        img: 'thumbnails/projects/Form (Mocap).png',
+        tags: ['Motion Capture', 'Body', 'Experimental'],
+        search: 'form mocap body experimental josephine wenhao nguyen',
+        artists: [
+          { name: 'Josephine', photo: 'thumbnails/profiles/Form/Josephine/Josephine.jpeg', role: 'RMIT MAGI — 2026', bio: 'Josephine is an artist and researcher exploring how motion capture technology can be used as a tool for choreographic and expressive inquiry.' },
+          { name: 'Wenhao Li', photo: 'thumbnails/profiles/Form/WenhaoLi/Wenhao Li.png', role: 'RMIT MAGI — 2026', bio: 'Wenhao is a media designer and animator whose practice examines the formal and expressive qualities of the body in motion.' },
+          { name: 'Nguyen Khanh Bui', photo: 'thumbnails/profiles/Form/Nguyen Khanh Bui/Nguyen Khanh Bui.png', role: 'RMIT MAGI — 2026', bio: 'Nguyen is an artist working across animation and performance, using digital tools to explore memory, gesture, and the archive of the body.' },
+        ]
+      },
+      {
+        title: 'Bubblez',
+        student: 'Tzu-Yun, Sona, Tim — 2026',
+        img: 'thumbnails/projects/Bubblez.png',
+        tags: ['Play', 'Interactive', 'Character'],
+        search: 'bubblez play interactive character tzu-yun sona tim',
+        artists: [
+          { name: 'Tzu-Yun', photo: 'thumbnails/profiles/Bubblez/tzu-yun.jpg', role: 'RMIT MAGI — 2026', bio: 'Tzu-Yun is a designer and animator whose playful practice explores joyful interaction, character design, and tactile digital worlds.' },
+          { name: 'Sona', photo: 'thumbnails/profiles/Bubblez/Sona.jpg', role: 'RMIT MAGI — 2026', bio: 'Sona is a creative technologist and interaction designer interested in accessible, joyful play experiences.' },
+          { name: 'Tim', photo: 'thumbnails/profiles/Bubblez/Tim.png', role: 'RMIT MAGI — 2026', bio: 'Tim is a games artist and animator whose work centres on tactile aesthetics and whimsical interactive systems.' },
+        ]
+      },
+      {
+        title: 'Severance',
+        student: 'Jisu, Amanda — 2026',
+        img: 'thumbnails/projects/Severance (Looking Glass).png',
+        tags: ['Looking Glass', 'Spatial', 'Narrative'],
+        search: 'severance looking glass spatial narrative jisu amanda',
+        artists: [
+          { name: 'Jisu L.', photo: 'thumbnails/profiles/Severance (Looking Glass)/Jisu L.png', role: 'RMIT MAGI — 2026', bio: 'Jisu is a media artist and spatial designer working with holographic and light-field displays to create narrative-driven environments.' },
+          { name: 'Amanda R.', photo: 'thumbnails/profiles/Severance (Looking Glass)/Amanda R.png', role: 'RMIT MAGI — 2026', bio: 'Amanda is a designer and storyteller whose practice investigates psychological space, identity, and the boundaries of self through immersive media.' },
+        ]
+      },
+      {
+        title: 'Space Oddity',
+        student: 'Rebecca — 2026',
+        img: 'thumbnails/projects/Space Oddity.png',
+        tags: ['Music', 'Motion', 'Experimental'],
+        search: 'space oddity music motion experimental rebecca',
+        artists: [
+          { name: 'Rebecca', photo: 'thumbnails/profiles/Space Oddity/rebecca.jpg', role: 'RMIT MAGI — 2026', bio: 'Rebecca is a motion designer and visual artist whose work explores the relationship between music, movement, and spatial experience.' },
+        ]
+      },
+      {
+        title: 'Liminal',
+        student: 'RMIT MAGI — 2026',
+        img: 'thumbnails/projects/Liminal.png',
+        tags: ['Environment', 'Atmospheric', 'Space'],
+        search: 'liminal environment atmospheric space',
+        artists: []
+      },
+    ];
+
+    const cards = [...document.querySelectorAll('.floating-card')];
+    let nextProjectIdx = PROJECTS.length > 4 ? 4 : 0;
+    let swapSlot = 0;
+    let isSwapping = false;
+
+    function isMobile() { return window.innerWidth < 600; }
+    function CARD_W()   { return isMobile() ? 160 : 245; }
+    function CARD_H()   { return isMobile() ? 200 : 260; }
+
+    function getOrbit() {
+      const W = window.innerWidth, H = window.innerHeight;
+      const mob = isMobile();
+      return {
+        rx: mob ? Math.min(W * 0.38, 165) : Math.min(310, W * 0.22),
+        ry: mob ? Math.min(H * 0.30, 220) : Math.min(255, H * 0.28),
+        cx: W / 2,
+        cy: H / 2,
+      };
+    }
+
+    function angleToPos(angle) {
+      const { rx, ry, cx, cy } = getOrbit();
+      const cw = CARD_W(), ch = CARD_H();
+      const rad = (angle * Math.PI) / 180;
+      return {
+        left: Math.max(8, Math.min(window.innerWidth  - cw - 8, cx + rx * Math.cos(rad) - cw / 2)),
+        top:  Math.max(8, Math.min(window.innerHeight - ch - 8, cy + ry * Math.sin(rad) - ch / 2)),
+      };
+    }
+
+    /* Seed angles organically — first is random, each next fills the widest gap */
+    let cardAngles = (() => {
+      const angles = [Math.random() * 360];
+      for (let i = 1; i < 4; i++) {
+        let best = 0, bestDist = -1;
+        for (let a = 0; a < 360; a += 3) {
+          const minDist = Math.min(...angles.map(o => {
+            const d = Math.abs(a - o) % 360;
+            return d > 180 ? 360 - d : d;
+          }));
+          if (minDist > bestDist) { bestDist = minDist; best = a; }
+        }
+        angles.push((best + (Math.random() - 0.5) * 50 + 360) % 360);
+      }
+      return angles;
+    })();
+
+    function bestAngleFor(slotIndex) {
+      const others = cardAngles.filter((_, i) => i !== slotIndex);
+      let best = 0, bestDist = -1;
+      for (let a = 0; a < 360; a += 3) {
+        const minDist = Math.min(...others.map(o => {
+          const d = Math.abs(a - o) % 360;
+          return d > 180 ? 360 - d : d;
+        }));
+        if (minDist > bestDist) { bestDist = minDist; best = a; }
+      }
+      return (best + (Math.random() - 0.5) * 50 + 360) % 360;
+    }
+
+    function renderCard(card, project) {
+      const thumb   = card.querySelector('.fc-thumb img');
+      const spec    = card.querySelector('.fc-spec');
+      const title   = card.querySelector('.fc-title');
+      const student = card.querySelector('.fc-student');
+      const tags    = card.querySelector('.fc-tags');
+      if (thumb)   { thumb.src = project.img; thumb.alt = project.title; }
+      if (spec) {
+        if (project.label) {
+          spec.className = 'fc-spec ' + (project.cls || '');
+          spec.textContent = project.label;
+          spec.style.display = '';
+        } else {
+          spec.style.display = 'none';
+        }
+      }
+      if (title)   title.textContent   = project.title;
+      if (student) student.textContent = project.student;
+      if (tags)    tags.innerHTML = project.tags.map(t => `<span class="fc-tag">${t}</span>`).join('');
+      card.dataset.search = project.search || '';
+      card.dataset.spec   = project.spec   || '';
+    }
+
+    function placeCard(card, slotIndex) {
+      const pos = angleToPos(cardAngles[slotIndex]);
+      card.style.left = pos.left + 'px';
+      card.style.top  = pos.top  + 'px';
+    }
+
+    /* Initialise */
+    cards.forEach((card, i) => {
+      renderCard(card, PROJECTS[i % PROJECTS.length]);
+      placeCard(card, i);
+    });
+
+    /* ── Ghost / background depth cards ── */
+    const GHOST_DEPTH_DEFS = [
+      { cls: 'ghost-near', anim: 'ghostNearFloat', dur: '13s', delay: '0s'   },
+      { cls: 'ghost-far',  anim: 'ghostFarFloat',  dur: '21s', delay: '-8s'  },
+      { cls: 'ghost-mid',  anim: 'ghostMidFloat',  dur: '17s', delay: '-4s'  },
+      { cls: 'ghost-near', anim: 'ghostNearFloat', dur: '15s', delay: '-11s' },
+      { cls: 'ghost-far',  anim: 'ghostFarFloat',  dur: '19s', delay: '-6s'  },
+      { cls: 'ghost-mid',  anim: 'ghostMidFloat',  dur: '23s', delay: '-15s' },
+    ];
+    const GHOST_COUNT = Math.min(GHOST_DEPTH_DEFS.length, PROJECTS.length - cards.length);
+
+    /* Track which project indices are currently shown in foreground cards */
+    let activeProjectIndices = cards.map((_, i) => i); // [0,1,2,3]
+    let ghostEls = [];
+    let ghostAngles = [];
+
+    function getInactiveIndices() {
+      return PROJECTS.map((_, i) => i).filter(i => !activeProjectIndices.includes(i));
+    }
+
+    function ghostCardHTML(proj) {
+      return `<div class="fc-thumb"><img src="${proj.img}" alt="${proj.title}" loading="lazy" /></div>
+        <div class="fc-body">
+          <div class="fc-spec" style="display:none"></div>
+          <div class="fc-title">${proj.title}</div>
+          <div class="fc-student">${proj.student}</div>
+          <div class="fc-tags">${proj.tags.map(t => `<span class="fc-tag">${t}</span>`).join('')}</div>
+        </div>`;
+    }
+
+    function updateGhostContent() {
+      const inactive = getInactiveIndices();
+      ghostEls.forEach((ghost, i) => {
+        const proj = PROJECTS[inactive[i % inactive.length]];
+        ghost.innerHTML = ghostCardHTML(proj);
+      });
+    }
+
+    function findGhostAngle(takenAngles) {
+      let best = 0, bestDist = -1;
+      for (let a = 0; a < 360; a += 3) {
+        const minDist = Math.min(...takenAngles.map(o => {
+          const d = Math.abs(a - o) % 360;
+          return d > 180 ? 360 - d : d;
+        }));
+        if (minDist > bestDist) { bestDist = minDist; best = a; }
+      }
+      return (best + (Math.random() - 0.5) * 28 + 360) % 360;
+    }
+
+    /* Build ghost cards once — positions stay fixed, only content updates on swap */
+    (function initGhosts() {
+      const stage = document.querySelector('.stage');
+      const takenAngles = [...cardAngles];
+      const inactive = getInactiveIndices();
+
+      for (let i = 0; i < GHOST_COUNT; i++) {
+        const def   = GHOST_DEPTH_DEFS[i];
+        const angle = findGhostAngle(takenAngles);
+        takenAngles.push(angle);
+        ghostAngles.push(angle);
+
+        const pos  = angleToPos(angle);
+        const proj = PROJECTS[inactive[i % inactive.length]];
+
+        const ghost = document.createElement('div');
+        ghost.className = `floating-card ghost-card ${def.cls}`;
+        ghost.style.left            = pos.left + 'px';
+        ghost.style.top             = pos.top  + 'px';
+        ghost.style.animationName   = def.anim;
+        ghost.style.animationDuration = def.dur;
+        ghost.style.animationDelay  = def.delay;
+        ghost.innerHTML = ghostCardHTML(proj);
+
+        /* Insert before the foreground cards so they paint underneath */
+        stage.insertBefore(ghost, stage.firstChild);
+        ghostEls.push(ghost);
+      }
+    })();
+
+    /* Skip nextProjectIdx past any project already in the foreground */
+    function advanceNextIdx() {
+      let guard = 0;
+      while (activeProjectIndices.includes(nextProjectIdx) && guard++ < PROJECTS.length) {
+        nextProjectIdx = (nextProjectIdx + 1) % PROJECTS.length;
+      }
+    }
+
+    /* Core swap — pulls the card at swapSlot out and puts projIdx in */
+    function swapInProject(projIdx, onDone) {
+      if (isSwapping) return;
+      isSwapping = true;
+
+      const card = cards[swapSlot];
+      card.classList.add('swapping');
+
+      setTimeout(() => {
+        activeProjectIndices[swapSlot] = projIdx;
+
+        renderCard(card, PROJECTS[projIdx]);
+        cardAngles[swapSlot] = bestAngleFor(swapSlot);
+        placeCard(card, swapSlot);
+        card.classList.remove('swapping');
+
+        swapSlot = (swapSlot + 1) % cards.length;
+        updateGhostContent();
+        if (onDone) onDone();
+
+        setTimeout(() => { isSwapping = false; }, 550);
+      }, 500);
+    }
+
+    /* Scroll/touch-driven swap — uses nextProjectIdx queue */
+    function swapCard() {
+      advanceNextIdx(); // skip any project already visible
+      const projIdx = nextProjectIdx;
+      nextProjectIdx = (nextProjectIdx + 1) % PROJECTS.length;
+      swapInProject(projIdx);
+    }
+
+    /* ── Scroll-driven swap ── */
+    let scrollAccum = 0;
+    const SCROLL_THRESHOLD = 80;
+
+    window.addEventListener('wheel', e => {
+      scrollAccum += Math.abs(e.deltaY);
+      if (scrollAccum >= SCROLL_THRESHOLD) {
+        scrollAccum = 0;
+        swapCard();
+      }
+    }, { passive: true });
+
+    let touchStartY = 0;
+    window.addEventListener('touchstart', e => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    window.addEventListener('touchmove', e => {
+      /* Fire on both up AND down swipes */
+      if (Math.abs(e.touches[0].clientY - touchStartY) > 30) {
+        swapCard();
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    /* Reposition all cards when viewport resizes (orientation change etc.) */
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        cards.forEach((card, i) => placeCard(card, i));
+      }, 120);
+    });
+
+    /* ── Outer rotating ring ─────────────────────────────────────────── */
+    /*
+     * A second ellipse, larger than the main orbit, filled with small faint
+     * project thumbnails that slowly drift — giving the impression of a big
+     * database behind the four active cards.
+     */
+    const OUTER_COUNT = 6;
+    /* Per-slot size + opacity variation to sell depth within the ring */
+    const OUTER_SLOTS = [
+      { w: 118, op: 0.09 }, { w:  96, op: 0.04 },
+      { w: 108, op: 0.07 }, { w: 100, op: 0.05 },
+      { w: 115, op: 0.08 }, { w:  92, op: 0.04 },
+    ];
+
+    function getOuterOrbit() {
+      const W = window.innerWidth, H = window.innerHeight;
+      const { cx, cy } = getOrbit();
+      return {
+        rx: Math.min(W * 0.44, 500),
+        ry: Math.min(H * 0.38, 380),
+        cx, cy,
+      };
+    }
+
+    function outerPos(angleDeg, cardW) {
+      const { rx, ry, cx, cy } = getOuterOrbit();
+      const W = window.innerWidth, H = window.innerHeight;
+      const rad = (angleDeg * Math.PI) / 180;
+      const cardH = Math.round(cardW * 9 / 16); // thumb-only height
+      return {
+        left: Math.max(2, Math.min(W - cardW - 2, cx + rx * Math.cos(rad) - cardW / 2)),
+        top:  Math.max(2, Math.min(H - cardH - 2, cy + ry * Math.sin(rad) - cardH / 2)),
+      };
+    }
+
+    const outerEls = []; // { el, baseAngle, w }
+    let outerOffset = 0;
+
+    (function initOuterRing() {
+      if (window.innerWidth < 600) return; // hidden on mobile
+      const stage = document.querySelector('.stage');
+
+      for (let i = 0; i < OUTER_COUNT; i++) {
+        const baseAngle = (360 / OUTER_COUNT) * i;
+        const slot = OUTER_SLOTS[i % OUTER_SLOTS.length];
+        const proj = PROJECTS[i % PROJECTS.length];
+
+        const el = document.createElement('div');
+        el.className = 'outer-ring-card';
+        el.style.width   = slot.w + 'px';
+        el.style.opacity = slot.op;
+        el.innerHTML = `<img src="${proj.img}" alt="" loading="lazy" />`;
+
+        const p = outerPos(baseAngle, slot.w);
+        el.style.left = p.left + 'px';
+        el.style.top  = p.top  + 'px';
+
+        stage.insertBefore(el, stage.firstChild); // paint behind everything
+        outerEls.push({ el, baseAngle, w: slot.w });
+      }
+
+      /* Slow continuous rotation — one full revolution ≈ 10 minutes */
+      (function tick() {
+        outerOffset = (outerOffset + 0.01) % 360;
+        outerEls.forEach(({ el, baseAngle, w }) => {
+          const p = outerPos((baseAngle + outerOffset) % 360, w);
+          el.style.left = p.left + 'px';
+          el.style.top  = p.top  + 'px';
+        });
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    /* ── Search ── */
+    const searchInput = document.getElementById('searchInput');
+
+    function highlightForeground(q) {
+      cards.forEach(card => {
+        const hit = (card.dataset.search || '').toLowerCase().includes(q);
+        card.classList.toggle('card-highlight', hit);
+        card.classList.toggle('card-dim', !hit);
+      });
+    }
+
+    function applySearch() {
+      const q = searchInput.value.trim().toLowerCase();
+
+      /* Clear state */
+      if (!q) {
+        cards.forEach(card => card.classList.remove('card-dim', 'card-highlight'));
+        return;
+      }
+
+      /* Find first matching project not already in the foreground */
+      const matchIdx = PROJECTS.findIndex((p, i) =>
+        !activeProjectIndices.includes(i) &&
+        ((p.search || '').toLowerCase().includes(q) || p.title.toLowerCase().includes(q))
+      );
+
+      if (matchIdx !== -1) {
+        /* Bring the matching project into the foreground, then re-highlight */
+        cards.forEach(card => card.classList.add('card-dim'));
+        swapInProject(matchIdx, () => highlightForeground(q));
+      } else {
+        /* All matches are already in the foreground — just dim/highlight in place */
+        highlightForeground(q);
+      }
+    }
+
+    searchInput.addEventListener('input', applySearch);
+
+    document.querySelectorAll('.search-hint span').forEach(chip => {
+      chip.addEventListener('click', () => {
+        searchInput.value = chip.textContent.trim();
+        applySearch();
+        searchInput.focus();
+      });
+    });
+
+    /* ── Modal ── */
+    const backdrop     = document.getElementById('modalBackdrop');
+    const modalImg     = document.getElementById('modalImg');
+    const modalSpec    = document.getElementById('modalSpec');
+    const modalTitle   = document.getElementById('modalTitle');
+    const modalStudent = document.getElementById('modalStudent');
+    const modalTags    = document.getElementById('modalTags');
+
+    /* ── Floating avatars around the modal ── */
+    let avatarWraps = [];
+    const floatClasses = ['av-float-1','av-float-2','av-float-3','av-float-4','av-float-5','av-float-6'];
+
+    /* Bio card */
+    const bioCard = document.createElement('div');
+    bioCard.className = 'artist-bio';
+    bioCard.innerHTML = `
+      <button class="bio-close" id="bioClose">✕</button>
+      <div class="bio-avatar" id="bioAvatar"></div>
+      <div class="bio-name"   id="bioName"></div>
+      <div class="bio-role"   id="bioRole"></div>
+      <div class="bio-text"   id="bioText"></div>`;
+    document.body.appendChild(bioCard);
+    document.getElementById('bioClose').addEventListener('click', () => bioCard.classList.remove('open'));
+
+    function showBio(artist, anchorX, anchorY) {
+      const W = window.innerWidth, H = window.innerHeight;
+      const BW = 240, BH = 200;
+
+      /* Populate */
+      const bioAv = document.getElementById('bioAvatar');
+      bioAv.innerHTML = artist.photo
+        ? `<img src="${artist.photo}" alt="${artist.name}" />`
+        : artist.name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+
+      document.getElementById('bioName').textContent = artist.name;
+      document.getElementById('bioRole').textContent = artist.role || 'RMIT MAGI — 2026';
+      document.getElementById('bioText').textContent = artist.bio  || 'Bio coming soon.';
+
+      /* Open away from the modal centre — avatars left of centre pop left, right pop right */
+      const onLeft = anchorX < W / 2;
+      let left = onLeft ? anchorX - BW - 52 : anchorX + 52;
+      let top  = anchorY - BH / 2;
+
+      /* Clamp to viewport */
+      if (left < 12)           left = 12;
+      if (left + BW > W - 12)  left = W - BW - 12;
+      if (top  < 12)           top  = 12;
+      if (top  + BH > H - 12)  top  = H - BH - 12;
+
+      bioCard.style.left = left + 'px';
+      bioCard.style.top  = top  + 'px';
+      bioCard.classList.add('open');
+    }
+
+    function createAvatars(artists) {
+      avatarWraps.forEach(w => w.remove());
+      avatarWraps = [];
+      bioCard.classList.remove('open');
+
+      const W = window.innerWidth, H = window.innerHeight;
+      const cx = W / 2, cy = H / 2;
+      const orbitR = Math.min(360, Math.min(W, H) * 0.3);
+      const baseAngle = Math.random() * 360;
+      const step = 360 / artists.length;
+
+      artists.forEach((artist, i) => {
+        const angle = baseAngle + step * i + (Math.random() * 24 - 12);
+        const rad   = (angle * Math.PI) / 180;
+        const x     = cx + orbitR * Math.cos(rad);
+        const y     = cy + orbitR * Math.sin(rad);
+
+        const wrap = document.createElement('div');
+        wrap.className = 'modal-avatar-wrap';
+        wrap.style.left = x + 'px';
+        wrap.style.top  = y + 'px';
+
+        const av = document.createElement('div');
+        av.className = 'modal-avatar ' + floatClasses[i % floatClasses.length];
+        av.innerHTML = artist.photo
+          ? `<img src="${artist.photo}" alt="${artist.name}" />`
+          : artist.name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+
+        const label = document.createElement('div');
+        label.className = 'avatar-name';
+        label.textContent = artist.name.split(' ')[0]; // first name only
+
+        wrap.appendChild(av);
+        wrap.appendChild(label);
+        document.body.appendChild(wrap);
+        avatarWraps.push(wrap);
+
+        wrap.addEventListener('click', e => {
+          e.stopPropagation();
+          showBio(artist, x, y);
+        });
+
+        setTimeout(() => {
+          av.classList.add('visible');
+          label.classList.add('visible');
+        }, i * 80 + 60);
+      });
+    }
+
+    function removeAvatars() {
+      bioCard.classList.remove('open');
+      avatarWraps.forEach(wrap => {
+        wrap.querySelectorAll('.modal-avatar, .avatar-name').forEach(el => el.classList.remove('visible'));
+        setTimeout(() => wrap.remove(), 450);
+      });
+      avatarWraps = [];
+    }
+
+    function openModal(card) {
+      const img     = card.querySelector('.fc-thumb img');
+      const spec    = card.querySelector('.fc-spec');
+      const title   = card.querySelector('.fc-title');
+      const student = card.querySelector('.fc-student');
+      const tags    = card.querySelector('.fc-tags');
+      modalImg.src             = img     ? img.src  : '';
+      modalImg.alt             = img     ? img.alt  : '';
+      modalSpec.className      = 'fc-spec ' + (spec ? [...spec.classList].slice(1).join(' ') : '');
+      modalSpec.textContent    = spec    ? spec.textContent    : '';
+      modalTitle.textContent   = title   ? title.textContent   : '';
+      modalStudent.textContent = student ? student.textContent : '';
+      modalTags.innerHTML      = tags    ? tags.innerHTML      : '';
+      backdrop.classList.add('open');
+
+      /* Match project by title to get artists list */
+      const titleText = title ? title.textContent : '';
+      const project   = PROJECTS.find(p => p.title === titleText);
+      if (project && project.artists) createAvatars(project.artists);
+    }
+
+    function closeModal() {
+      backdrop.classList.remove('open');
+      removeAvatars();
+    }
+
+    cards.forEach(card => card.addEventListener('click', () => openModal(card)));
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    backdrop.addEventListener('click', e => {
+      if (e.target === backdrop) closeModal();
+      else bioCard.classList.remove('open');
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+
+</body>
+</html>
