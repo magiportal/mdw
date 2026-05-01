@@ -180,9 +180,10 @@
       animation-timing-function: ease-in-out;
       animation-iteration-count: infinite;
       animation-direction: alternate;
-      transition: opacity 0.9s ease;
+      transition: opacity 1s ease;
     }
     .ghost-card:hover { box-shadow: none; }
+    .ghost-card.ghost-fading { opacity: 0; }
 
     /* Depth tiers — opacity + z-index only; scale lives in keyframes */
     .ghost-near { opacity: 0.14; z-index: 2; }
@@ -239,6 +240,44 @@
     /* Floating cards: thumbnail only — no gradient, no text */
     .floating-card .fc-body  { display: none !important; }
     .floating-card .fc-thumb::after { display: none !important; }
+
+    /* ── HOVER PROFILE BUBBLES ───────────────────── */
+    .hover-avatar-wrap {
+      position: fixed;
+      z-index: 35;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.82);
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+    .hover-avatar-wrap.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .hover-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+    }
+    .hover-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
     .fc-spec {
       display: inline-block;
@@ -1080,6 +1119,7 @@
     let activeProjectIndices = cards.map((_, i) => i); // [0,1,2,3]
     let ghostEls = [];
     let ghostAngles = [];
+    const GHOST_FADE_MS = 1000;
 
     function getInactiveIndices() {
       return PROJECTS.map((_, i) => i).filter(i => !activeProjectIndices.includes(i));
@@ -1095,12 +1135,33 @@
         </div>`;
     }
 
+    function renderGhost(ghost, projectIdx) {
+      ghost.dataset.projectIndex = projectIdx;
+      ghost.innerHTML = ghostCardHTML(PROJECTS[projectIdx]);
+    }
+
     function updateGhostContent() {
       const inactive = getInactiveIndices();
       ghostEls.forEach((ghost, i) => {
-        const proj = PROJECTS[inactive[i % inactive.length]];
-        ghost.innerHTML = ghostCardHTML(proj);
+        renderGhost(ghost, inactive[i % inactive.length]);
       });
+    }
+
+    function swapGhostWithFade(ghost, replacementProjectIdx, onDone) {
+      if (!ghost) {
+        if (onDone) onDone();
+        return;
+      }
+
+      ghost.classList.add('ghost-fading');
+
+      setTimeout(() => {
+        renderGhost(ghost, replacementProjectIdx);
+        requestAnimationFrame(() => {
+          ghost.classList.remove('ghost-fading');
+          if (onDone) setTimeout(onDone, GHOST_FADE_MS);
+        });
+      }, GHOST_FADE_MS);
     }
 
     function findGhostAngle(takenAngles) {
@@ -1128,7 +1189,6 @@
         ghostAngles.push(angle);
 
         const pos  = angleToPos(angle);
-        const proj = PROJECTS[inactive[i % inactive.length]];
 
         const ghost = document.createElement('div');
         ghost.className = `floating-card ghost-card ${def.cls}`;
@@ -1137,7 +1197,7 @@
         ghost.style.animationName   = def.anim;
         ghost.style.animationDuration = def.dur;
         ghost.style.animationDelay  = def.delay;
-        ghost.innerHTML = ghostCardHTML(proj);
+        renderGhost(ghost, inactive[i % inactive.length]);
 
         /* Insert before the foreground cards so they paint underneath */
         stage.insertBefore(ghost, stage.firstChild);
@@ -1159,6 +1219,9 @@
       isSwapping = true;
 
       const card = cards[swapSlot];
+      const outgoingProjectIdx = activeProjectIndices[swapSlot];
+      const swappedGhost = ghostEls.find(ghost => Number(ghost.dataset.projectIndex) === projIdx);
+      hideHoverAvatars(true);
       card.classList.add('swapping');
 
       setTimeout(() => {
@@ -1170,10 +1233,8 @@
         card.classList.remove('swapping');
 
         swapSlot = (swapSlot + 1) % cards.length;
-        updateGhostContent();
+        swapGhostWithFade(swappedGhost, outgoingProjectIdx, () => { isSwapping = false; });
         if (onDone) onDone();
-
-        setTimeout(() => { isSwapping = false; }, 550);
       }, 500);
     }
 
@@ -1215,7 +1276,104 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         cards.forEach((card, i) => placeCard(card, i));
+        hideHoverAvatars(true);
       }, 120);
+    });
+
+    /* ── Foreground card hover profiles ──────────────────────────────── */
+    let hoverAvatarWraps = [];
+    let hoverAvatarRemovalTimer;
+    let hoverAvatarToken = 0;
+
+    function artistInitials(name) {
+      return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function seededNoise(seed) {
+      const x = Math.sin(seed * 999) * 10000;
+      return x - Math.floor(x);
+    }
+
+    function hoverAvatarPosition(card, index, total, projectIdx) {
+      const rect = card.getBoundingClientRect();
+      const angleJitter = (seededNoise((projectIdx + 1) * 17 + index) - 0.5) * 44;
+      const angle = (-90 + (360 / total) * index + angleJitter) * Math.PI / 180;
+      const radiusJitterX = 0.82 + seededNoise((projectIdx + 1) * 29 + index) * 0.42;
+      const radiusJitterY = 0.82 + seededNoise((projectIdx + 1) * 37 + index) * 0.42;
+      const radiusX = Math.max(rect.width * 0.62, 96) * radiusJitterX;
+      const radiusY = Math.max(rect.height * 0.86, 78) * radiusJitterY;
+      const x = rect.left + rect.width / 2 + Math.cos(angle) * radiusX;
+      const y = rect.top + rect.height / 2 + Math.sin(angle) * radiusY;
+
+      return {
+        x: clamp(x, 32, window.innerWidth - 32),
+        y: clamp(y, 32, window.innerHeight - 32),
+      };
+    }
+
+    function hideHoverAvatars(immediate = false) {
+      clearTimeout(hoverAvatarRemovalTimer);
+      hoverAvatarToken++;
+
+      if (immediate) {
+        hoverAvatarWraps.forEach(wrap => wrap.remove());
+        hoverAvatarWraps = [];
+        return;
+      }
+
+      const wraps = [...hoverAvatarWraps];
+      const stepMs = 65;
+      const fadeMs = 280;
+      wraps.forEach((wrap, i) => {
+        wrap.style.transitionDelay = ((wraps.length - 1 - i) * stepMs) + 'ms';
+        wrap.classList.remove('visible');
+      });
+
+      hoverAvatarRemovalTimer = setTimeout(() => {
+        wraps.forEach(wrap => wrap.remove());
+        hoverAvatarWraps = hoverAvatarWraps.filter(wrap => !wraps.includes(wrap));
+      }, fadeMs + Math.max(0, wraps.length - 1) * stepMs + 40);
+    }
+
+    function showHoverAvatars(card) {
+      const cardIndex = cards.indexOf(card);
+      const projectIdx = activeProjectIndices[cardIndex];
+      const project = PROJECTS[projectIdx];
+      if (!project || !project.artists || !project.artists.length) return;
+
+      hideHoverAvatars(true);
+      const token = ++hoverAvatarToken;
+      const stepMs = 75;
+
+      project.artists.forEach((artist, i) => {
+        const pos = hoverAvatarPosition(card, i, project.artists.length, projectIdx);
+        const wrap = document.createElement('div');
+        wrap.className = 'hover-avatar-wrap';
+        wrap.style.left = pos.x + 'px';
+        wrap.style.top = pos.y + 'px';
+        wrap.style.transitionDelay = (i * stepMs) + 'ms';
+        wrap.innerHTML = `
+          <div class="hover-avatar">
+            ${artist.photo ? `<img src="${artist.photo}" alt="${artist.name}" />` : artistInitials(artist.name)}
+          </div>`;
+
+        document.body.appendChild(wrap);
+        hoverAvatarWraps.push(wrap);
+      });
+
+      requestAnimationFrame(() => {
+        if (token !== hoverAvatarToken) return;
+        hoverAvatarWraps.forEach(wrap => wrap.classList.add('visible'));
+      });
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => showHoverAvatars(card));
+      card.addEventListener('mouseleave', () => hideHoverAvatars());
     });
 
     /* ── Outer rotating ring ─────────────────────────────────────────── */
@@ -1450,6 +1608,8 @@
     }
 
     function openModal(card) {
+      hideHoverAvatars(true);
+
       const img     = card.querySelector('.fc-thumb img');
       const spec    = card.querySelector('.fc-spec');
       const title   = card.querySelector('.fc-title');
