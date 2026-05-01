@@ -125,7 +125,7 @@
     /* ── FLOATING CARDS ──────────────────────────── */
     .floating-card {
       position: absolute;
-      width: 240px;
+      width: 280px;
       background: var(--white);
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -232,25 +232,13 @@
       transform: scale(1.04);
     }
 
-    /* Gradient fade from image into card body */
-    .fc-thumb::after {
-      content: '';
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 35%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.82) 100%);
-      pointer-events: none;
-    }
-
     .fc-body {
       padding: 6px 12px 13px;
     }
 
-    /* On floating cards, hide everything except the artist name */
-    .floating-card .fc-spec,
-    .floating-card .fc-title,
-    .floating-card .fc-tags,
-    .floating-card .fc-link { display: none !important; }
+    /* Floating cards: thumbnail only — no gradient, no text */
+    .floating-card .fc-body  { display: none !important; }
+    .floating-card .fc-thumb::after { display: none !important; }
 
     .fc-spec {
       display: inline-block;
@@ -995,15 +983,15 @@
     let isSwapping = false;
 
     function isMobile() { return window.innerWidth < 600; }
-    function CARD_W()   { return isMobile() ? 160 : 245; }
-    function CARD_H()   { return isMobile() ? 200 : 260; }
+    function CARD_W()   { return isMobile() ? 160 : 282; }
+    function CARD_H()   { return isMobile() ? 90  : 159; } // 16:9 thumb only, no body
 
     function getOrbit() {
       const W = window.innerWidth, H = window.innerHeight;
       const mob = isMobile();
       return {
-        rx: mob ? Math.min(W * 0.38, 165) : Math.min(310, W * 0.22),
-        ry: mob ? Math.min(H * 0.30, 220) : Math.min(255, H * 0.28),
+        rx: mob ? Math.min(W * 0.38, 165) : Math.min(360, W * 0.26),
+        ry: mob ? Math.min(H * 0.30, 220) : Math.min(290, H * 0.30),
         cx: W / 2,
         cy: H / 2,
       };
