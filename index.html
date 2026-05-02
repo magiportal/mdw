@@ -30,8 +30,7 @@
       font-size: 15px;
       font-weight: 400;
       line-height: 1.6;
-      height: 100%;
-      overflow: hidden;
+      min-height: 100%;
     }
 
     /* ── NAV ─────────────────────────────────────── */
@@ -111,13 +110,11 @@
       justify-content: center;
     }
 
-    /* Subtle noise texture overlay */
+    /* Stage overlay — fully transparent, no grey vignette */
     .stage::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image:
-        radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255,255,255,0) 40%, rgba(240,240,240,0.25) 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -132,7 +129,7 @@
       overflow: hidden;
       cursor: pointer;
       z-index: 3;
-      transition: opacity 0.5s ease, box-shadow 0.35s ease;
+      transition: opacity 0.65s ease, box-shadow 0.35s ease;
       will-change: opacity;
     }
     .floating-card.swapping {
@@ -213,6 +210,32 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.2);
       z-index: 15;
     }
+
+    /* ── STAGE NAVIGATION ARROWS ────────────────── */
+    .stage-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background: none;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(0,0,0,0.3);
+      transition: border-color 0.2s ease, color 0.2s ease;
+      padding: 0;
+    }
+    .stage-arrow:hover {
+      border-color: rgba(0,0,0,0.28);
+      color: rgba(0,0,0,0.65);
+    }
+    .stage-arrow-left  { left: 28px; }
+    .stage-arrow-right { right: 28px; }
 
     /* ── CARD INTERNALS ──────────────────────────── */
     .fc-thumb {
@@ -520,6 +543,20 @@
       letter-spacing: 0.05em;
       margin-bottom: 14px;
     }
+    .modal-description {
+      display: none;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line-mid);
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    .modal-description.visible {
+      display: block;
+    }
     .modal-close {
       position: absolute;
       top: 14px;
@@ -697,6 +734,204 @@
       display: block;
     }
 
+    /* ── PROJECTS GRID SECTION ───────────────────── */
+    .projects-section {
+      padding: 140px 24px 140px;
+      background: var(--white);
+      position: relative;
+    }
+
+
+    /* ── FOLDER DATABASE (unified) ───────────────── */
+    .folders-wrap {
+      max-width: 620px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    .folder-item {
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .folder-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .folder-item:last-child {
+      border-bottom: none;
+    }
+    .folder-item.folder-dim {
+      opacity: 0.12;
+      pointer-events: none;
+    }
+    .folder-item.folder-highlight > .folder-tab .folder-tab-title {
+      color: var(--black);
+    }
+
+    .folder-tab {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 17px 24px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+    .folder-tab-left {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .folder-tab:hover {
+      background: rgba(0,0,0,0.025);
+    }
+    .folder-item.open > .folder-tab {
+      background: rgba(0,0,0,0.02);
+    }
+
+    .folder-tab-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+    .folder-tab-sub {
+      font-size: 10.5px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--dim);
+      margin-top: 2px;
+      text-transform: none;
+    }
+    .folder-tab-arrow {
+      flex-shrink: 0;
+      color: var(--line);
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    .folder-item.open .folder-tab-arrow {
+      transform: rotate(180deg);
+      color: var(--dim);
+    }
+
+    .folder-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .folder-item.open .folder-content {
+      max-height: 900px;
+    }
+
+    .folder-inner {
+      padding: 0 24px 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .folder-thumb {
+      aspect-ratio: 16 / 9;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 18px 0 14px;
+      cursor: pointer;
+    }
+    .folder-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .folder-thumb:hover img {
+      transform: scale(1.03);
+    }
+
+    .folder-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .folder-tags .fc-tag {
+      font-size: 9px;
+      padding: 3px 8px;
+    }
+
+    .folder-desc {
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    .folder-open-cta {
+      margin-top: 14px;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--line);
+    }
+
+    .folder-artists {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .folder-artist-bubble {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .folder-artist-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #f0f0f0;
+      flex-shrink: 0;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .folder-artist-bubble:hover .folder-artist-avatar {
+      transform: scale(1.08);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .folder-artist-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .folder-artist-avatar-initials {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--dim);
+    }
+    .folder-artist-name {
+      font-size: 10.5px;
+      font-weight: 400;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
     /* ── MOBILE ──────────────────────────────────── */
     @media (max-width: 600px) {
 
@@ -722,6 +957,13 @@
 
       /* Footer stays readable */
       .footer-strip { padding: 0 14px; }
+
+      /* Folder database on mobile */
+      .projects-section { padding: 100px 16px 80px; }
+      .folders-wrap { border-radius: 14px; }
+      .folder-tab { padding: 15px 18px; }
+      .folder-tab-title { font-size: 12px; }
+      .folder-inner { padding: 0 16px 20px; }
     }
 
   </style>
@@ -731,85 +973,11 @@
   <!-- ── STAGE ──────────────────────────────────────── -->
   <section class="stage">
 
-    <!-- Card 1 — Research -->
-    <div class="floating-card card-1"
-         data-spec="research"
-         data-search="nature influence environment motion ecology research alex nguyen">
-      <div class="fc-thumb">
-        <img src="media/s4210724-natures-influence.webp" alt="Nature's Influence" />
-      </div>
-      <div class="fc-body">
-        <div class="fc-spec fc-spec-research">Research</div>
-        <div class="fc-title">Nature's Influence</div>
-        <div class="fc-student">Alex Nguyen — 2026</div>
-        <div class="fc-tags">
-          <span class="fc-tag">Ecology</span>
-          <span class="fc-tag">Motion</span>
-          <span class="fc-tag">Critical</span>
-        </div>
-        <a class="fc-link" href="#">View work ›</a>
-      </div>
-    </div>
-
-    <!-- Card 2 — Animation -->
-    <div class="floating-card card-2"
-         data-spec="animation"
-         data-search="love egg animation narrative 2d character maya santos">
-      <div class="fc-thumb">
-        <img src="media/s4017090-love-in-the-form-of-an-egg.webp" alt="Love in the Form of an Egg" />
-      </div>
-      <div class="fc-body">
-        <div class="fc-spec fc-spec-animation">Animation</div>
-        <div class="fc-title">Love in the Form of an Egg</div>
-        <div class="fc-student">Maya Santos — 2026</div>
-        <div class="fc-tags">
-          <span class="fc-tag">Narrative</span>
-          <span class="fc-tag">2D</span>
-          <span class="fc-tag">Character</span>
-        </div>
-        <a class="fc-link" href="#">View work ›</a>
-      </div>
-    </div>
-
-    <!-- Card 3 — Games -->
-    <div class="floating-card card-3"
-         data-spec="games"
-         data-search="remnants days games unity hdrp websocket critical design james park">
-      <div class="fc-thumb">
-        <img src="media/s3634079-remnants-of-our-days.webp" alt="Remnants of Our Days" />
-      </div>
-      <div class="fc-body">
-        <div class="fc-spec fc-spec-games">Games</div>
-        <div class="fc-title">Remnants of Our Days</div>
-        <div class="fc-student">James Park — 2026</div>
-        <div class="fc-tags">
-          <span class="fc-tag">Unity</span>
-          <span class="fc-tag">Critical</span>
-          <span class="fc-tag">World</span>
-        </div>
-        <a class="fc-link" href="#">View work ›</a>
-      </div>
-    </div>
-
-    <!-- Card 4 — Interactivity -->
-    <div class="floating-card card-4"
-         data-spec="interactivity"
-         data-search="mind tilt interactivity installation physical computing sensor sara chen">
-      <div class="fc-thumb">
-        <img src="media/s4148738-mind-tilt.webp" alt="Mind Tilt" />
-      </div>
-      <div class="fc-body">
-        <div class="fc-spec fc-spec-interactivity">Interactivity</div>
-        <div class="fc-title">Mind Tilt</div>
-        <div class="fc-student">Sara Chen — 2026</div>
-        <div class="fc-tags">
-          <span class="fc-tag">Installation</span>
-          <span class="fc-tag">Sensor</span>
-          <span class="fc-tag">Body</span>
-        </div>
-        <a class="fc-link" href="#">View work ›</a>
-      </div>
-    </div>
+    <!-- Foreground floating project cards -->
+    <div class="floating-card card-1"><div class="fc-thumb"><img src="" alt="" /></div></div>
+    <div class="floating-card card-2"><div class="fc-thumb"><img src="" alt="" /></div></div>
+    <div class="floating-card card-3"><div class="fc-thumb"><img src="" alt="" /></div></div>
+    <div class="floating-card card-4"><div class="fc-thumb"><img src="" alt="" /></div></div>
 
     <!-- ── CENTER ─────────────────────────────────── -->
     <div class="stage-center">
@@ -845,6 +1013,24 @@
 
     <div class="collab-label">RMIT MAGI × Melbourne Design Week 2026</div>
 
+    <button class="stage-arrow stage-arrow-left" id="arrowLeft" aria-label="Previous projects">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M8 2L4 6.5 8 11" stroke="currentColor" stroke-width="1.2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="stage-arrow stage-arrow-right" id="arrowRight" aria-label="Next projects">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M5 2l4 4.5-4 4.5" stroke="currentColor" stroke-width="1.2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+  </section>
+
+  <!-- ── PROJECT FOLDERS ──────────────────────────── -->
+  <section class="projects-section">
+    <div class="folders-wrap" id="foldersWrap"></div>
   </section>
 
   <!-- ── MODAL ─────────────────────────────────────── -->
@@ -857,6 +1043,7 @@
         <div class="modal-title" id="modalTitle"></div>
         <div class="modal-student" id="modalStudent"></div>
         <div class="fc-tags" id="modalTags"></div>
+        <div class="modal-description" id="modalDescription"></div>
       </div>
     </div>
   </div>
@@ -870,6 +1057,7 @@
         student: 'Zixin, Hilary, Lou, Gavin — 2026',
         img: 'thumbnails/projects/Not a Robot .jpg',
         tags: ['Motion Capture', 'Performance', 'Character'],
+        description: 'Not a Robot explores the tension between mechanical precision and human expressiveness through real-time motion capture performance. The work interrogates what remains distinctly human when the body is translated into data — and what gets lost, or gained, in transmission.',
         search: 'not a robot mocap performance character zixin hilary lou gavin',
         artists: [
           { name: 'Zixin Liang', photo: 'thumbnails/profiles/Not a Robot (Mocap)/Images/Zixin Liang Jessi_image.jpg', role: 'RMIT MAGI — 2026', bio: 'Zixin (Jessi) is a media artist working across motion capture and performance-based practice.' },
@@ -883,6 +1071,7 @@
         student: 'Teesta, Da Long, Anjaly, Anjali — 2026',
         img: 'thumbnails/projects/Beeyond Sight (Nova).png',
         tags: ['Nova', 'Immersive', 'XR'],
+        description: 'BEEyond Sight invites audiences into the perceptual world of the honeybee through an extended reality environment built on the Nova platform. By translating ultraviolet vision, vibration, and spatial orientation into immersive sensation, the work asks us to reconsider the boundaries of consciousness and ecological kinship.',
         search: 'beeyond sight nova immersive xr teesta dalong anjaly anjali',
         artists: [
           { name: 'Teesta Singh', photo: 'thumbnails/profiles/Beeyond Sight (Nova)/Teesta Singh.jpg', role: 'RMIT MAGI — 2026', bio: 'Teesta is an interactive media designer with a focus on immersive environments and sensory storytelling.' },
@@ -896,6 +1085,7 @@
         student: 'Andy, Zhuoer, Guanlei — 2026',
         img: 'thumbnails/projects/Look away.jpg',
         tags: ['Meta', 'XR', 'Interactive'],
+        description: 'Look Away is a mixed-reality work that turns gaze itself into the medium. Using eye-tracking and spatial computing, the piece responds to where — and where not — the viewer chooses to look, revealing how attention shapes reality and what we choose to leave unseen.',
         search: 'look away meta xr interactive andy zhuoer guanlei',
         artists: [
           { name: 'Andy', photo: 'thumbnails/profiles/Look Away (Meta)/Andy.jpg', role: 'RMIT MAGI — 2026', bio: 'Andy is a new media artist exploring attention, gaze, and the politics of visibility through interactive installation.' },
@@ -908,6 +1098,7 @@
         student: 'Kora, Doris, Thao — 2026',
         img: 'thumbnails/projects/Infinite Bloom.jpg',
         tags: ['Projection', 'Generative', 'Space'],
+        description: 'Infinite Bloom is a large-scale generative projection work that maps cycles of growth and decay onto architectural surfaces. Drawing from botanical systems and algorithmic pattern generation, the piece transforms its environment into a living canvas — perpetually flowering, dissolving, and renewing.',
         search: 'infinite bloom projection generative space kora doris thao',
         artists: [
           { name: 'Kora Lee', photo: 'thumbnails/profiles/Liminal -_ Infinite Bloom/Kora Lee.JPG', role: 'RMIT MAGI — 2026', bio: 'Kora is a media artist whose generative and projection-based work explores cycles of growth, decay, and regeneration.' },
@@ -920,6 +1111,7 @@
         student: 'Sofia, Sunny, Adrian, Yun, Anjali — 2026',
         img: 'thumbnails/projects/Gesturia.png',
         tags: ['Gesture', 'Motion', 'Interactive'],
+        description: 'GESTURIA is a real-time interactive system that transforms the body\'s gestures into dynamic visual language. Through hand tracking and custom visual feedback loops, participants discover how movement communicates beyond words — building an intuitive vocabulary between person and machine.',
         search: 'gesturia gesture motion interactive sofia sunny adrian yun anjali',
         artists: [
           { name: 'Sofia', photo: 'thumbnails/profiles/Gesturia/Sofia.jpg', role: 'RMIT MAGI — 2026', bio: 'Sofia is a creative practitioner whose work bridges gesture-based interaction and real-time visual systems.' },
@@ -934,6 +1126,7 @@
         student: 'Lexi, Rina, Girish, Yohan — 2026',
         img: 'thumbnails/projects/Nova Rover.png',
         tags: ['Nova', 'Simulation', 'Environment'],
+        description: 'Nova Rover places audiences in the operator\'s seat of a remote terrain vehicle navigating a speculative extraterrestrial landscape. Built on the Nova platform, the simulation raises questions about remote presence, environmental responsibility, and the ethics of exploration beyond our world.',
         search: 'nova rover simulation environment lexi rina girish yohan',
         artists: [
           { name: 'Lexi', photo: 'thumbnails/profiles/Nova Rover (Nova)/Lexi/Lexi.JPG', role: 'RMIT MAGI — 2026', bio: 'Lexi is a media designer and world-builder interested in speculative futures, robotics, and environmental simulation.' },
@@ -947,6 +1140,7 @@
         student: 'Yujie, Xinyun, Erhan — 2026',
         img: 'thumbnails/projects/Symbiotic Echos.png',
         tags: ['Meta', 'Sound', 'Ecology'],
+        description: 'Symbiotic Echos is an immersive audio-visual installation that sonifies the hidden interdependencies of ecological systems. Audiences move through a spatial sound environment where organisms, frequencies, and field recordings weave together — revealing the acoustic life of ecosystems often rendered inaudible by the noise of the modern world.',
         search: 'symbiotic echos meta sound ecology yujie xinyun erhan',
         artists: [
           { name: 'Yujie', photo: 'thumbnails/profiles/Symbiotic Echos (Meta)/Yujie/Yujie.JPG', role: 'RMIT MAGI — 2026', bio: 'Yujie is a sound and media artist whose practice investigates acoustic ecology and the invisible relationships between living systems.' },
@@ -959,6 +1153,7 @@
         student: 'Josephine, Wenhao, Nguyen — 2026',
         img: 'thumbnails/projects/Form (Mocap).png',
         tags: ['Motion Capture', 'Body', 'Experimental'],
+        description: 'Form is an experimental motion capture work that treats the body as both subject and instrument. Through choreographed sequences and raw gesture, the project archives the body\'s movement as sculptural data — examining memory, physicality, and what it means to leave a digital imprint of the self.',
         search: 'form mocap body experimental josephine wenhao nguyen',
         artists: [
           { name: 'Josephine', photo: 'thumbnails/profiles/Form/Josephine/Josephine.jpeg', role: 'RMIT MAGI — 2026', bio: 'Josephine is an artist and researcher exploring how motion capture technology can be used as a tool for choreographic and expressive inquiry.' },
@@ -971,6 +1166,7 @@
         student: 'Tzu-Yun, Sona, Tim — 2026',
         img: 'thumbnails/projects/Bubblez.png',
         tags: ['Play', 'Interactive', 'Character'],
+        description: 'Bubblez is a joyful interactive experience centred on tactile play and character-driven world-building. Designed to be immediately intuitive, the work invites audiences of all ages to interact with buoyant, responsive characters — exploring how delight and accessibility can coexist in interactive media.',
         search: 'bubblez play interactive character tzu-yun sona tim',
         artists: [
           { name: 'Tzu-Yun', photo: 'thumbnails/profiles/Bubblez/tzu-yun.jpg', role: 'RMIT MAGI — 2026', bio: 'Tzu-Yun is a designer and animator whose playful practice explores joyful interaction, character design, and tactile digital worlds.' },
@@ -983,6 +1179,7 @@
         student: 'Jisu, Amanda — 2026',
         img: 'thumbnails/projects/Severance (Looking Glass).png',
         tags: ['Looking Glass', 'Spatial', 'Narrative'],
+        description: 'Severance is a holographic narrative work presented on the Looking Glass light-field display. The piece explores psychological rupture and the fractured sense of self — using spatial depth and layered imagery to construct an interior landscape that exists between memory and dissociation.',
         search: 'severance looking glass spatial narrative jisu amanda',
         artists: [
           { name: 'Jisu L.', photo: 'thumbnails/profiles/Severance (Looking Glass)/Jisu L.png', role: 'RMIT MAGI — 2026', bio: 'Jisu is a media artist and spatial designer working with holographic and light-field displays to create narrative-driven environments.' },
@@ -994,6 +1191,7 @@
         student: 'Rebecca — 2026',
         img: 'thumbnails/projects/Space Oddity.png',
         tags: ['Music', 'Motion', 'Experimental'],
+        description: 'Space Oddity is a motion design work that translates the emotional arc of music into kinetic visual form. Inspired by themes of isolation, wonder, and the vastness of space, the piece uses rhythm, colour, and choreographed animation to create a synesthetic journey between sound and image.',
         search: 'space oddity music motion experimental rebecca',
         artists: [
           { name: 'Rebecca', photo: 'thumbnails/profiles/Space Oddity/rebecca.jpg', role: 'RMIT MAGI — 2026', bio: 'Rebecca is a motion designer and visual artist whose work explores the relationship between music, movement, and spatial experience.' },
@@ -1004,19 +1202,23 @@
         student: 'RMIT MAGI — 2026',
         img: 'thumbnails/projects/Liminal.png',
         tags: ['Environment', 'Atmospheric', 'Space'],
+        description: 'Liminal is an atmospheric environment work that inhabits the thresholds between states — between interior and exterior, presence and absence, the familiar and the uncanny. Visitors are invited to slow down and dwell in a space that resists definition, embracing ambiguity as its primary material.',
         search: 'liminal environment atmospheric space',
         artists: []
       },
     ];
 
-    const cards = [...document.querySelectorAll('.floating-card')];
-    let nextProjectIdx = PROJECTS.length > 4 ? 4 : 0;
-    let swapSlot = 0;
-    let isSwapping = false;
+    /* ─────────────────────────────────────────────────────────────────
+     *  Everything below is the runtime — no more card-swap machinery.
+     *  The hero stage has ghost / outer-ring decoration only.
+     *  Projects are revealed in the scrollable grid below the hero.
+     * ───────────────────────────────────────────────────────────────── */
 
     function isMobile() { return window.innerWidth < 600; }
-    function CARD_W()   { return isMobile() ? 160 : 282; }
-    function CARD_H()   { return isMobile() ? 90  : 159; } // 16:9 thumb only, no body
+
+    /* ── Ghost orbit math (background decoration) ── */
+    function CARD_W() { return isMobile() ? 120 : 200; }
+    function CARD_H() { return Math.round(CARD_W() * 9 / 16); }
 
     function getOrbit() {
       const W = window.innerWidth, H = window.innerHeight;
@@ -1024,8 +1226,7 @@
       return {
         rx: mob ? Math.min(W * 0.38, 165) : Math.min(360, W * 0.26),
         ry: mob ? Math.min(H * 0.30, 220) : Math.min(290, H * 0.30),
-        cx: W / 2,
-        cy: H / 2,
+        cx: W / 2, cy: H / 2,
       };
     }
 
@@ -1039,72 +1240,7 @@
       };
     }
 
-    /* Seed angles organically — first is random, each next fills the widest gap */
-    let cardAngles = (() => {
-      const angles = [Math.random() * 360];
-      for (let i = 1; i < 4; i++) {
-        let best = 0, bestDist = -1;
-        for (let a = 0; a < 360; a += 3) {
-          const minDist = Math.min(...angles.map(o => {
-            const d = Math.abs(a - o) % 360;
-            return d > 180 ? 360 - d : d;
-          }));
-          if (minDist > bestDist) { bestDist = minDist; best = a; }
-        }
-        angles.push((best + (Math.random() - 0.5) * 50 + 360) % 360);
-      }
-      return angles;
-    })();
-
-    function bestAngleFor(slotIndex) {
-      const others = cardAngles.filter((_, i) => i !== slotIndex);
-      let best = 0, bestDist = -1;
-      for (let a = 0; a < 360; a += 3) {
-        const minDist = Math.min(...others.map(o => {
-          const d = Math.abs(a - o) % 360;
-          return d > 180 ? 360 - d : d;
-        }));
-        if (minDist > bestDist) { bestDist = minDist; best = a; }
-      }
-      return (best + (Math.random() - 0.5) * 50 + 360) % 360;
-    }
-
-    function renderCard(card, project) {
-      const thumb   = card.querySelector('.fc-thumb img');
-      const spec    = card.querySelector('.fc-spec');
-      const title   = card.querySelector('.fc-title');
-      const student = card.querySelector('.fc-student');
-      const tags    = card.querySelector('.fc-tags');
-      if (thumb)   { thumb.src = project.img; thumb.alt = project.title; }
-      if (spec) {
-        if (project.label) {
-          spec.className = 'fc-spec ' + (project.cls || '');
-          spec.textContent = project.label;
-          spec.style.display = '';
-        } else {
-          spec.style.display = 'none';
-        }
-      }
-      if (title)   title.textContent   = project.title;
-      if (student) student.textContent = project.student;
-      if (tags)    tags.innerHTML = project.tags.map(t => `<span class="fc-tag">${t}</span>`).join('');
-      card.dataset.search = project.search || '';
-      card.dataset.spec   = project.spec   || '';
-    }
-
-    function placeCard(card, slotIndex) {
-      const pos = angleToPos(cardAngles[slotIndex]);
-      card.style.left = pos.left + 'px';
-      card.style.top  = pos.top  + 'px';
-    }
-
-    /* Initialise */
-    cards.forEach((card, i) => {
-      renderCard(card, PROJECTS[i % PROJECTS.length]);
-      placeCard(card, i);
-    });
-
-    /* ── Ghost / background depth cards ── */
+    /* ── Ghost background cards ── */
     const GHOST_DEPTH_DEFS = [
       { cls: 'ghost-near', anim: 'ghostNearFloat', dur: '13s', delay: '0s'   },
       { cls: 'ghost-far',  anim: 'ghostFarFloat',  dur: '21s', delay: '-8s'  },
@@ -1113,277 +1249,113 @@
       { cls: 'ghost-far',  anim: 'ghostFarFloat',  dur: '19s', delay: '-6s'  },
       { cls: 'ghost-mid',  anim: 'ghostMidFloat',  dur: '23s', delay: '-15s' },
     ];
-    const GHOST_COUNT = Math.min(GHOST_DEPTH_DEFS.length, PROJECTS.length - cards.length);
-
-    /* Track which project indices are currently shown in foreground cards */
-    let activeProjectIndices = cards.map((_, i) => i); // [0,1,2,3]
-    let ghostEls = [];
-    let ghostAngles = [];
-    const GHOST_FADE_MS = 1000;
-
-    function getInactiveIndices() {
-      return PROJECTS.map((_, i) => i).filter(i => !activeProjectIndices.includes(i));
-    }
-
-    function ghostCardHTML(proj) {
-      return `<div class="fc-thumb"><img src="${proj.img}" alt="${proj.title}" loading="lazy" /></div>
-        <div class="fc-body">
-          <div class="fc-spec" style="display:none"></div>
-          <div class="fc-title">${proj.title}</div>
-          <div class="fc-student">${proj.student}</div>
-          <div class="fc-tags">${proj.tags.map(t => `<span class="fc-tag">${t}</span>`).join('')}</div>
-        </div>`;
-    }
-
-    function renderGhost(ghost, projectIdx) {
-      ghost.dataset.projectIndex = projectIdx;
-      ghost.innerHTML = ghostCardHTML(PROJECTS[projectIdx]);
-    }
-
-    function updateGhostContent() {
-      const inactive = getInactiveIndices();
-      ghostEls.forEach((ghost, i) => {
-        renderGhost(ghost, inactive[i % inactive.length]);
-      });
-    }
-
-    function swapGhostWithFade(ghost, replacementProjectIdx, onDone) {
-      if (!ghost) {
-        if (onDone) onDone();
-        return;
-      }
-
-      ghost.classList.add('ghost-fading');
-
-      setTimeout(() => {
-        renderGhost(ghost, replacementProjectIdx);
-        requestAnimationFrame(() => {
-          ghost.classList.remove('ghost-fading');
-          if (onDone) setTimeout(onDone, GHOST_FADE_MS);
-        });
-      }, GHOST_FADE_MS);
-    }
 
     function findGhostAngle(takenAngles) {
       let best = 0, bestDist = -1;
       for (let a = 0; a < 360; a += 3) {
-        const minDist = Math.min(...takenAngles.map(o => {
-          const d = Math.abs(a - o) % 360;
-          return d > 180 ? 360 - d : d;
-        }));
+        const minDist = takenAngles.length
+          ? Math.min(...takenAngles.map(o => { const d = Math.abs(a - o) % 360; return d > 180 ? 360 - d : d; }))
+          : 360;
         if (minDist > bestDist) { bestDist = minDist; best = a; }
       }
       return (best + (Math.random() - 0.5) * 28 + 360) % 360;
     }
 
-    /* Build ghost cards once — positions stay fixed, only content updates on swap */
     (function initGhosts() {
       const stage = document.querySelector('.stage');
-      const takenAngles = [...cardAngles];
-      const inactive = getInactiveIndices();
-
-      for (let i = 0; i < GHOST_COUNT; i++) {
-        const def   = GHOST_DEPTH_DEFS[i];
+      const takenAngles = [];
+      GHOST_DEPTH_DEFS.forEach((def, i) => {
         const angle = findGhostAngle(takenAngles);
         takenAngles.push(angle);
-        ghostAngles.push(angle);
-
         const pos  = angleToPos(angle);
-
+        const proj = PROJECTS[i % PROJECTS.length];
         const ghost = document.createElement('div');
         ghost.className = `floating-card ghost-card ${def.cls}`;
-        ghost.style.left            = pos.left + 'px';
-        ghost.style.top             = pos.top  + 'px';
-        ghost.style.animationName   = def.anim;
+        ghost.style.left              = pos.left + 'px';
+        ghost.style.top               = pos.top  + 'px';
+        ghost.style.animationName     = def.anim;
         ghost.style.animationDuration = def.dur;
-        ghost.style.animationDelay  = def.delay;
-        renderGhost(ghost, inactive[i % inactive.length]);
-
-        /* Insert before the foreground cards so they paint underneath */
+        ghost.style.animationDelay    = def.delay;
+        ghost.innerHTML = `<div class="fc-thumb"><img src="${proj.img}" alt="${proj.title}" loading="lazy" /></div>`;
         stage.insertBefore(ghost, stage.firstChild);
-        ghostEls.push(ghost);
-      }
+      });
     })();
 
-    /* Skip nextProjectIdx past any project already in the foreground */
-    function advanceNextIdx() {
-      let guard = 0;
-      while (activeProjectIndices.includes(nextProjectIdx) && guard++ < PROJECTS.length) {
-        nextProjectIdx = (nextProjectIdx + 1) % PROJECTS.length;
-      }
-    }
+    /* ── Foreground floating cards ───────────────────────────────────── */
+    const cards = [...document.querySelectorAll('.floating-card:not(.ghost-card)')];
 
-    /* Core swap — pulls the card at swapSlot out and puts projIdx in */
-    function swapInProject(projIdx, onDone) {
-      if (isSwapping) return;
-      isSwapping = true;
+    /* Foreground card dimensions (larger than ghost) */
+    function FG_W() { return isMobile() ? 155 : 280; }
+    function FG_H() { return Math.round(FG_W() * 9 / 16); }
 
-      const card = cards[swapSlot];
-      const outgoingProjectIdx = activeProjectIndices[swapSlot];
-      const swappedGhost = ghostEls.find(ghost => Number(ghost.dataset.projectIndex) === projIdx);
-      hideHoverAvatars(true);
-      card.classList.add('swapping');
-
-      setTimeout(() => {
-        activeProjectIndices[swapSlot] = projIdx;
-
-        renderCard(card, PROJECTS[projIdx]);
-        cardAngles[swapSlot] = bestAngleFor(swapSlot);
-        placeCard(card, swapSlot);
-        card.classList.remove('swapping');
-
-        swapSlot = (swapSlot + 1) % cards.length;
-        swapGhostWithFade(swappedGhost, outgoingProjectIdx, () => { isSwapping = false; });
-        if (onDone) onDone();
-      }, 500);
-    }
-
-    /* Scroll/touch-driven swap — uses nextProjectIdx queue */
-    function swapCard() {
-      advanceNextIdx(); // skip any project already visible
-      const projIdx = nextProjectIdx;
-      nextProjectIdx = (nextProjectIdx + 1) % PROJECTS.length;
-      swapInProject(projIdx);
-    }
-
-    /* ── Scroll-driven swap ── */
-    let scrollAccum = 0;
-    const SCROLL_THRESHOLD = 80;
-
-    window.addEventListener('wheel', e => {
-      scrollAccum += Math.abs(e.deltaY);
-      if (scrollAccum >= SCROLL_THRESHOLD) {
-        scrollAccum = 0;
-        swapCard();
-      }
-    }, { passive: true });
-
-    let touchStartY = 0;
-    window.addEventListener('touchstart', e => {
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-    window.addEventListener('touchmove', e => {
-      /* Fire on both up AND down swipes */
-      if (Math.abs(e.touches[0].clientY - touchStartY) > 30) {
-        swapCard();
-        touchStartY = e.touches[0].clientY;
-      }
-    }, { passive: true });
-
-    /* Reposition all cards when viewport resizes (orientation change etc.) */
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        cards.forEach((card, i) => placeCard(card, i));
-        hideHoverAvatars(true);
-      }, 120);
-    });
-
-    /* ── Foreground card hover profiles ──────────────────────────────── */
-    let hoverAvatarWraps = [];
-    let hoverAvatarRemovalTimer;
-    let hoverAvatarToken = 0;
-
-    function artistInitials(name) {
-      return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
-    }
-
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    function seededNoise(seed) {
-      const x = Math.sin(seed * 999) * 10000;
-      return x - Math.floor(x);
-    }
-
-    function hoverAvatarPosition(card, index, total, projectIdx) {
-      const rect = card.getBoundingClientRect();
-      const angleJitter = (seededNoise((projectIdx + 1) * 17 + index) - 0.5) * 44;
-      const angle = (-90 + (360 / total) * index + angleJitter) * Math.PI / 180;
-      const radiusJitterX = 0.82 + seededNoise((projectIdx + 1) * 29 + index) * 0.42;
-      const radiusJitterY = 0.82 + seededNoise((projectIdx + 1) * 37 + index) * 0.42;
-      const radiusX = Math.max(rect.width * 0.62, 96) * radiusJitterX;
-      const radiusY = Math.max(rect.height * 0.86, 78) * radiusJitterY;
-      const x = rect.left + rect.width / 2 + Math.cos(angle) * radiusX;
-      const y = rect.top + rect.height / 2 + Math.sin(angle) * radiusY;
-
+    function angleToPosFG(angle) {
+      const { rx, ry, cx, cy } = getOrbit();
+      const cw = FG_W(), ch = FG_H();
+      const rad = (angle * Math.PI) / 180;
       return {
-        x: clamp(x, 32, window.innerWidth - 32),
-        y: clamp(y, 32, window.innerHeight - 32),
+        left: Math.max(8, Math.min(window.innerWidth  - cw - 8, cx + rx * Math.cos(rad) - cw / 2)),
+        top:  Math.max(8, Math.min(window.innerHeight - ch - 8, cy + ry * Math.sin(rad) - ch / 2)),
       };
     }
 
-    function hideHoverAvatars(immediate = false) {
-      clearTimeout(hoverAvatarRemovalTimer);
-      hoverAvatarToken++;
-
-      if (immediate) {
-        hoverAvatarWraps.forEach(wrap => wrap.remove());
-        hoverAvatarWraps = [];
-        return;
+    /* Organic angle seeding — first card random, each next fills widest gap */
+    let cardAngles = (() => {
+      const angles = [Math.random() * 360];
+      for (let i = 1; i < 4; i++) {
+        let best = 0, bestDist = -1;
+        for (let a = 0; a < 360; a += 3) {
+          const minDist = Math.min(...angles.map(o => { const d = Math.abs(a-o)%360; return d>180?360-d:d; }));
+          if (minDist > bestDist) { bestDist = minDist; best = a; }
+        }
+        angles.push((best + (Math.random()-0.5)*50 + 360) % 360);
       }
+      return angles;
+    })();
 
-      const wraps = [...hoverAvatarWraps];
-      const stepMs = 65;
-      const fadeMs = 280;
-      wraps.forEach((wrap, i) => {
-        wrap.style.transitionDelay = ((wraps.length - 1 - i) * stepMs) + 'ms';
-        wrap.classList.remove('visible');
-      });
-
-      hoverAvatarRemovalTimer = setTimeout(() => {
-        wraps.forEach(wrap => wrap.remove());
-        hoverAvatarWraps = hoverAvatarWraps.filter(wrap => !wraps.includes(wrap));
-      }, fadeMs + Math.max(0, wraps.length - 1) * stepMs + 40);
+    function placeCard(card, i) {
+      const pos = angleToPosFG(cardAngles[i]);
+      card.style.left = pos.left + 'px';
+      card.style.top  = pos.top  + 'px';
     }
 
-    function showHoverAvatars(card) {
-      const cardIndex = cards.indexOf(card);
-      const projectIdx = activeProjectIndices[cardIndex];
-      const project = PROJECTS[projectIdx];
-      if (!project || !project.artists || !project.artists.length) return;
-
-      hideHoverAvatars(true);
-      const token = ++hoverAvatarToken;
-      const stepMs = 75;
-
-      project.artists.forEach((artist, i) => {
-        const pos = hoverAvatarPosition(card, i, project.artists.length, projectIdx);
-        const wrap = document.createElement('div');
-        wrap.className = 'hover-avatar-wrap';
-        wrap.style.left = pos.x + 'px';
-        wrap.style.top = pos.y + 'px';
-        wrap.style.transitionDelay = (i * stepMs) + 'ms';
-        wrap.innerHTML = `
-          <div class="hover-avatar">
-            ${artist.photo ? `<img src="${artist.photo}" alt="${artist.name}" />` : artistInitials(artist.name)}
-          </div>`;
-
-        document.body.appendChild(wrap);
-        hoverAvatarWraps.push(wrap);
-      });
-
-      requestAnimationFrame(() => {
-        if (token !== hoverAvatarToken) return;
-        hoverAvatarWraps.forEach(wrap => wrap.classList.add('visible'));
-      });
+    function renderFGCard(card, project) {
+      const img = card.querySelector('.fc-thumb img');
+      if (img) { img.src = project.img; img.alt = project.title; }
+      card.dataset.search = project.search || '';
+      card._proj = project;
     }
 
-    cards.forEach(card => {
-      card.addEventListener('mouseenter', () => showHoverAvatars(card));
+    /* Init — show first 4 projects in the foreground */
+    let fgOffset = 0;
+    cards.forEach((card, i) => {
+      renderFGCard(card, PROJECTS[i % PROJECTS.length]);
+      placeCard(card, i);
+      card.addEventListener('click',      () => openModal(card._proj));
+      card.addEventListener('mouseenter', () => showHoverAvatars(card, card._proj));
       card.addEventListener('mouseleave', () => hideHoverAvatars());
     });
 
-    /* ── Outer rotating ring ─────────────────────────────────────────── */
-    /*
-     * A second ellipse, larger than the main orbit, filled with small faint
-     * project thumbnails that slowly drift — giving the impression of a big
-     * database behind the four active cards.
-     */
+    /* Cycle foreground cards left / right — fade all out, stagger fade in */
+    function cycleFG(dir) {
+      fgOffset = (fgOffset + dir + PROJECTS.length) % PROJECTS.length;
+      cards.forEach(card => card.classList.add('swapping'));
+      cards.forEach((card, i) => {
+        setTimeout(() => {
+          renderFGCard(card, PROJECTS[(fgOffset + i) % PROJECTS.length]);
+          card.classList.remove('swapping');
+        }, 350 + i * 130);
+      });
+    }
+    document.getElementById('arrowLeft').addEventListener('click',  () => cycleFG(-1));
+    document.getElementById('arrowRight').addEventListener('click', () => cycleFG(1));
+
+    /* Reposition on viewport resize */
+    window.addEventListener('resize', () => {
+      cards.forEach((card, i) => placeCard(card, i));
+    });
+
+    /* ── Outer rotating ring ── */
     const OUTER_COUNT = 6;
-    /* Per-slot size + opacity variation to sell depth within the ring */
     const OUTER_SLOTS = [
       { w: 118, op: 0.09 }, { w:  96, op: 0.04 },
       { w: 108, op: 0.07 }, { w: 100, op: 0.05 },
@@ -1393,51 +1365,41 @@
     function getOuterOrbit() {
       const W = window.innerWidth, H = window.innerHeight;
       const { cx, cy } = getOrbit();
-      return {
-        rx: Math.min(W * 0.44, 500),
-        ry: Math.min(H * 0.38, 380),
-        cx, cy,
-      };
+      return { rx: Math.min(W * 0.44, 500), ry: Math.min(H * 0.38, 380), cx, cy };
     }
 
     function outerPos(angleDeg, cardW) {
       const { rx, ry, cx, cy } = getOuterOrbit();
       const W = window.innerWidth, H = window.innerHeight;
       const rad = (angleDeg * Math.PI) / 180;
-      const cardH = Math.round(cardW * 9 / 16); // thumb-only height
+      const cardH = Math.round(cardW * 9 / 16);
       return {
         left: Math.max(2, Math.min(W - cardW - 2, cx + rx * Math.cos(rad) - cardW / 2)),
         top:  Math.max(2, Math.min(H - cardH - 2, cy + ry * Math.sin(rad) - cardH / 2)),
       };
     }
 
-    const outerEls = []; // { el, baseAngle, w }
+    const outerEls = [];
     let outerOffset = 0;
 
     (function initOuterRing() {
-      if (window.innerWidth < 600) return; // hidden on mobile
+      if (isMobile()) return;
       const stage = document.querySelector('.stage');
-
       for (let i = 0; i < OUTER_COUNT; i++) {
         const baseAngle = (360 / OUTER_COUNT) * i;
         const slot = OUTER_SLOTS[i % OUTER_SLOTS.length];
         const proj = PROJECTS[i % PROJECTS.length];
-
         const el = document.createElement('div');
         el.className = 'outer-ring-card';
         el.style.width   = slot.w + 'px';
         el.style.opacity = slot.op;
         el.innerHTML = `<img src="${proj.img}" alt="" loading="lazy" />`;
-
         const p = outerPos(baseAngle, slot.w);
         el.style.left = p.left + 'px';
         el.style.top  = p.top  + 'px';
-
-        stage.insertBefore(el, stage.firstChild); // paint behind everything
+        stage.insertBefore(el, stage.firstChild);
         outerEls.push({ el, baseAngle, w: slot.w });
       }
-
-      /* Slow continuous rotation — one full revolution ≈ 10 minutes */
       (function tick() {
         outerOffset = (outerOffset + 0.01) % 360;
         outerEls.forEach(({ el, baseAngle, w }) => {
@@ -1449,44 +1411,123 @@
       })();
     })();
 
-    /* ── Search ── */
-    const searchInput = document.getElementById('searchInput');
+    /* ── Project folders (accordion) ── */
+    (function buildFolders() {
+      const wrap = document.getElementById('foldersWrap');
+      let openItem = null;
 
-    function highlightForeground(q) {
-      cards.forEach(card => {
-        const hit = (card.dataset.search || '').toLowerCase().includes(q);
-        card.classList.toggle('card-highlight', hit);
-        card.classList.toggle('card-dim', !hit);
+      PROJECTS.forEach((proj, idx) => {
+        const item = document.createElement('div');
+        item.className = 'folder-item';
+        item.dataset.search = proj.search || '';
+        item.dataset.idx    = idx;
+
+        const artistNames = proj.artists && proj.artists.length
+          ? proj.artists.map(a => a.name).join(', ')
+          : (proj.student || '');
+
+        item.innerHTML = `
+          <div class="folder-tab">
+            <div class="folder-tab-left">
+              <div class="folder-tab-title">${proj.title}</div>
+              ${artistNames ? `<div class="folder-tab-sub">${artistNames}</div>` : ''}
+            </div>
+            <span class="folder-tab-arrow">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="folder-content">
+            <div class="folder-inner">
+              <div class="folder-thumb">
+                <img src="${proj.img}" alt="${proj.title}" loading="lazy" />
+              </div>
+              <div class="folder-tags">${proj.tags.map(t => `<span class="fc-tag">${t}</span>`).join('')}</div>
+              ${proj.description ? `<div class="folder-desc">${proj.description}</div>` : ''}
+              ${proj.artists && proj.artists.length ? `
+              <div class="folder-artists">
+                ${proj.artists.map((a, ai) => {
+                  const initials = a.name.split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+                  return `<div class="folder-artist-bubble" data-artist-idx="${ai}">
+                    <div class="folder-artist-avatar">
+                      ${a.photo
+                        ? `<img src="${a.photo}" alt="${a.name}" loading="lazy" />`
+                        : `<div class="folder-artist-avatar-initials">${initials}</div>`}
+                    </div>
+                    <span class="folder-artist-name">${a.name}</span>
+                  </div>`;
+                }).join('')}
+              </div>` : ''}
+              <div class="folder-open-cta">↗ Click image to view full project</div>
+            </div>
+          </div>`;
+
+        /* Tab click — toggle this folder, close any other */
+        item.querySelector('.folder-tab').addEventListener('click', () => {
+          const isOpen = item.classList.contains('open');
+          if (openItem && openItem !== item) {
+            openItem.classList.remove('open');
+          }
+          item.classList.toggle('open', !isOpen);
+          openItem = !isOpen ? item : null;
+        });
+
+        /* Thumbnail click — open modal with full artist experience */
+        item.querySelector('.folder-thumb').addEventListener('click', e => {
+          e.stopPropagation();
+          openModal(proj);
+        });
+
+        /* Artist bubble clicks — open modal (full experience with that artist's bio) */
+        item.querySelectorAll('.folder-artist-bubble').forEach(bubble => {
+          bubble.addEventListener('click', e => {
+            e.stopPropagation();
+            openModal(proj);
+          });
+        });
+
+        wrap.appendChild(item);
       });
-    }
+
+      /* Scroll-reveal — stagger each row as the container enters view */
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            wrap.querySelectorAll('.folder-item').forEach((item, i) => {
+              setTimeout(() => item.classList.add('visible'), i * 100);
+            });
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.05 });
+      io.observe(wrap);
+    })();
+
+    /* ── Search — filters folders ── */
+    const searchInput = document.getElementById('searchInput');
 
     function applySearch() {
       const q = searchInput.value.trim().toLowerCase();
-
-      /* Clear state */
-      if (!q) {
-        cards.forEach(card => card.classList.remove('card-dim', 'card-highlight'));
-        return;
-      }
-
-      /* Find first matching project not already in the foreground */
-      const matchIdx = PROJECTS.findIndex((p, i) =>
-        !activeProjectIndices.includes(i) &&
-        ((p.search || '').toLowerCase().includes(q) || p.title.toLowerCase().includes(q))
-      );
-
-      if (matchIdx !== -1) {
-        /* Bring the matching project into the foreground, then re-highlight */
-        cards.forEach(card => card.classList.add('card-dim'));
-        swapInProject(matchIdx, () => highlightForeground(q));
-      } else {
-        /* All matches are already in the foreground — just dim/highlight in place */
-        highlightForeground(q);
-      }
+      document.querySelectorAll('.folder-item').forEach(item => {
+        if (!q) {
+          item.classList.remove('folder-dim', 'folder-highlight');
+          return;
+        }
+        const hit = (item.dataset.search || '').toLowerCase().includes(q);
+        item.classList.toggle('folder-highlight', hit);
+        item.classList.toggle('folder-dim', !hit);
+        /* Auto-open the first matching folder */
+        if (hit && !item.classList.contains('open')) {
+          const firstMatch = document.querySelector('.folder-item.folder-highlight');
+          if (firstMatch === item) item.classList.add('open');
+        }
+      });
+      if (q) document.querySelector('.projects-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     searchInput.addEventListener('input', applySearch);
-
     document.querySelectorAll('.search-hint span').forEach(chip => {
       chip.addEventListener('click', () => {
         searchInput.value = chip.textContent.trim();
@@ -1495,6 +1536,66 @@
       });
     });
 
+    /* ── Hover avatar bubbles ── */
+    let hoverAvatarWraps = [];
+    let hoverAvatarRemovalTimer;
+    let hoverAvatarToken = 0;
+
+    function artistInitials(name) {
+      return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+    }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function seededNoise(seed) { const x = Math.sin(seed * 999) * 10000; return x - Math.floor(x); }
+
+    function hoverAvatarPosition(card, index, total, projectIdx) {
+      const rect = card.getBoundingClientRect();
+      const angleJitter = (seededNoise((projectIdx + 1) * 17 + index) - 0.5) * 44;
+      const angle = (-90 + (360 / total) * index + angleJitter) * Math.PI / 180;
+      const rx = Math.max(rect.width  * 0.62, 96) * (0.82 + seededNoise((projectIdx + 1) * 29 + index) * 0.42);
+      const ry = Math.max(rect.height * 0.86, 78) * (0.82 + seededNoise((projectIdx + 1) * 37 + index) * 0.42);
+      return {
+        x: clamp(rect.left + rect.width  / 2 + Math.cos(angle) * rx, 32, window.innerWidth  - 32),
+        y: clamp(rect.top  + rect.height / 2 + Math.sin(angle) * ry, 32, window.innerHeight - 32),
+      };
+    }
+
+    function hideHoverAvatars(immediate = false) {
+      clearTimeout(hoverAvatarRemovalTimer);
+      hoverAvatarToken++;
+      if (immediate) { hoverAvatarWraps.forEach(w => w.remove()); hoverAvatarWraps = []; return; }
+      const wraps = [...hoverAvatarWraps];
+      const stepMs = 65, fadeMs = 280;
+      wraps.forEach((wrap, i) => { wrap.style.transitionDelay = ((wraps.length - 1 - i) * stepMs) + 'ms'; wrap.classList.remove('visible'); });
+      hoverAvatarRemovalTimer = setTimeout(() => {
+        wraps.forEach(wrap => wrap.remove());
+        hoverAvatarWraps = hoverAvatarWraps.filter(w => !wraps.includes(w));
+      }, fadeMs + Math.max(0, wraps.length - 1) * stepMs + 40);
+    }
+
+    function showHoverAvatars(card, project) {
+      if (!project || !project.artists || !project.artists.length) return;
+      hideHoverAvatars(true);
+      const projectIdx = PROJECTS.indexOf(project);
+      const token = ++hoverAvatarToken;
+      project.artists.forEach((artist, i) => {
+        const pos = hoverAvatarPosition(card, i, project.artists.length, projectIdx);
+        const wrap = document.createElement('div');
+        wrap.className = 'hover-avatar-wrap';
+        wrap.style.left = pos.x + 'px';
+        wrap.style.top  = pos.y + 'px';
+        wrap.style.transitionDelay = (i * 75) + 'ms';
+        wrap.innerHTML = `<div class="hover-avatar">${artist.photo ? `<img src="${artist.photo}" alt="${artist.name}" />` : artistInitials(artist.name)}</div>`;
+        document.body.appendChild(wrap);
+        hoverAvatarWraps.push(wrap);
+      });
+      requestAnimationFrame(() => {
+        if (token !== hoverAvatarToken) return;
+        hoverAvatarWraps.forEach(wrap => wrap.classList.add('visible'));
+      });
+    }
+
+    window.addEventListener('resize', () => hideHoverAvatars(true));
+
     /* ── Modal ── */
     const backdrop     = document.getElementById('modalBackdrop');
     const modalImg     = document.getElementById('modalImg');
@@ -1502,12 +1603,12 @@
     const modalTitle   = document.getElementById('modalTitle');
     const modalStudent = document.getElementById('modalStudent');
     const modalTags    = document.getElementById('modalTags');
+    const modalDescription = document.getElementById('modalDescription');
 
-    /* ── Floating avatars around the modal ── */
+    /* Floating artist avatars around the modal */
     let avatarWraps = [];
     const floatClasses = ['av-float-1','av-float-2','av-float-3','av-float-4','av-float-5','av-float-6'];
 
-    /* Bio card */
     const bioCard = document.createElement('div');
     bioCard.className = 'artist-bio';
     bioCard.innerHTML = `
@@ -1520,30 +1621,18 @@
     document.getElementById('bioClose').addEventListener('click', () => bioCard.classList.remove('open'));
 
     function showBio(artist, anchorX, anchorY) {
-      const W = window.innerWidth, H = window.innerHeight;
-      const BW = 240, BH = 200;
-
-      /* Populate */
-      const bioAv = document.getElementById('bioAvatar');
-      bioAv.innerHTML = artist.photo
+      const W = window.innerWidth, H = window.innerHeight, BW = 240, BH = 200;
+      document.getElementById('bioAvatar').innerHTML = artist.photo
         ? `<img src="${artist.photo}" alt="${artist.name}" />`
         : artist.name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
-
       document.getElementById('bioName').textContent = artist.name;
       document.getElementById('bioRole').textContent = artist.role || 'RMIT MAGI — 2026';
       document.getElementById('bioText').textContent = artist.bio  || 'Bio coming soon.';
-
-      /* Open away from the modal centre — avatars left of centre pop left, right pop right */
       const onLeft = anchorX < W / 2;
       let left = onLeft ? anchorX - BW - 52 : anchorX + 52;
       let top  = anchorY - BH / 2;
-
-      /* Clamp to viewport */
-      if (left < 12)           left = 12;
-      if (left + BW > W - 12)  left = W - BW - 12;
-      if (top  < 12)           top  = 12;
-      if (top  + BH > H - 12)  top  = H - BH - 12;
-
+      if (left < 12) left = 12; if (left + BW > W - 12) left = W - BW - 12;
+      if (top  < 12) top  = 12; if (top  + BH > H - 12) top  = H - BH - 12;
       bioCard.style.left = left + 'px';
       bioCard.style.top  = top  + 'px';
       bioCard.classList.add('open');
@@ -1553,48 +1642,29 @@
       avatarWraps.forEach(w => w.remove());
       avatarWraps = [];
       bioCard.classList.remove('open');
-
       const W = window.innerWidth, H = window.innerHeight;
       const cx = W / 2, cy = H / 2;
       const orbitR = Math.min(360, Math.min(W, H) * 0.3);
       const baseAngle = Math.random() * 360;
-      const step = 360 / artists.length;
-
       artists.forEach((artist, i) => {
-        const angle = baseAngle + step * i + (Math.random() * 24 - 12);
-        const rad   = (angle * Math.PI) / 180;
-        const x     = cx + orbitR * Math.cos(rad);
-        const y     = cy + orbitR * Math.sin(rad);
-
+        const angle = baseAngle + (360 / artists.length) * i + (Math.random() * 24 - 12);
+        const rad = (angle * Math.PI) / 180;
+        const x = cx + orbitR * Math.cos(rad);
+        const y = cy + orbitR * Math.sin(rad);
         const wrap = document.createElement('div');
         wrap.className = 'modal-avatar-wrap';
-        wrap.style.left = x + 'px';
-        wrap.style.top  = y + 'px';
-
+        wrap.style.left = x + 'px'; wrap.style.top = y + 'px';
         const av = document.createElement('div');
         av.className = 'modal-avatar ' + floatClasses[i % floatClasses.length];
-        av.innerHTML = artist.photo
-          ? `<img src="${artist.photo}" alt="${artist.name}" />`
-          : artist.name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
-
+        av.innerHTML = artist.photo ? `<img src="${artist.photo}" alt="${artist.name}" />` : artist.name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
         const label = document.createElement('div');
         label.className = 'avatar-name';
-        label.textContent = artist.name.split(' ')[0]; // first name only
-
-        wrap.appendChild(av);
-        wrap.appendChild(label);
+        label.textContent = artist.name.split(' ')[0];
+        wrap.appendChild(av); wrap.appendChild(label);
         document.body.appendChild(wrap);
         avatarWraps.push(wrap);
-
-        wrap.addEventListener('click', e => {
-          e.stopPropagation();
-          showBio(artist, x, y);
-        });
-
-        setTimeout(() => {
-          av.classList.add('visible');
-          label.classList.add('visible');
-        }, i * 80 + 60);
+        wrap.addEventListener('click', e => { e.stopPropagation(); showBio(artist, x, y); });
+        setTimeout(() => { av.classList.add('visible'); label.classList.add('visible'); }, i * 80 + 60);
       });
     }
 
@@ -1607,27 +1677,17 @@
       avatarWraps = [];
     }
 
-    function openModal(card) {
+    function openModal(project) {
       hideHoverAvatars(true);
-
-      const img     = card.querySelector('.fc-thumb img');
-      const spec    = card.querySelector('.fc-spec');
-      const title   = card.querySelector('.fc-title');
-      const student = card.querySelector('.fc-student');
-      const tags    = card.querySelector('.fc-tags');
-      modalImg.src             = img     ? img.src  : '';
-      modalImg.alt             = img     ? img.alt  : '';
-      modalSpec.className      = 'fc-spec ' + (spec ? [...spec.classList].slice(1).join(' ') : '');
-      modalSpec.textContent    = spec    ? spec.textContent    : '';
-      modalTitle.textContent   = title   ? title.textContent   : '';
-      modalStudent.textContent = student ? student.textContent : '';
-      modalTags.innerHTML      = tags    ? tags.innerHTML      : '';
+      modalImg.src             = project.img;
+      modalImg.alt             = project.title;
+      modalTitle.textContent   = project.title;
+      modalStudent.textContent = project.student;
+      modalTags.innerHTML      = project.tags.map(t => `<span class="fc-tag">${t}</span>`).join('');
+      modalDescription.textContent = project.description || '';
+      modalDescription.classList.toggle('visible', Boolean(project.description));
       backdrop.classList.add('open');
-
-      /* Match project by title to get artists list */
-      const titleText = title ? title.textContent : '';
-      const project   = PROJECTS.find(p => p.title === titleText);
-      if (project && project.artists) createAvatars(project.artists);
+      if (project.artists && project.artists.length) createAvatars(project.artists);
     }
 
     function closeModal() {
@@ -1635,7 +1695,6 @@
       removeAvatars();
     }
 
-    cards.forEach(card => card.addEventListener('click', () => openModal(card)));
     document.getElementById('modalClose').addEventListener('click', closeModal);
     backdrop.addEventListener('click', e => {
       if (e.target === backdrop) closeModal();
