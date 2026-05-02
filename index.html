@@ -385,6 +385,15 @@
     }
 
     /* ── SEARCH ──────────────────────────────────── */
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: all;
+    }
+    .stage-arrow-mob {
+      display: none; /* desktop: hidden — desktop uses .stage-arrow */
+    }
     .search-wrap {
       pointer-events: all;
       position: relative;
@@ -742,105 +751,120 @@
     }
 
 
-    /* ── FOLDER DATABASE (unified) ───────────────── */
+    /* ── FOLDER CATALOG ──────────────────────────── */
     .folders-wrap {
-      max-width: 620px;
+      max-width: 660px;
       margin: 0 auto;
-      border: 1px solid var(--line);
-      border-radius: 18px;
+      border: 1px solid #d4d4d4;
+      border-radius: 4px;
       overflow: hidden;
-      background: var(--white);
+      background: #f0f0f0;
     }
 
     .folder-item {
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #d4d4d4;
       opacity: 0;
       transform: translateY(14px);
-      transition: opacity 0.75s ease, transform 0.75s ease;
+      transition: opacity 0.75s ease, transform 0.75s ease,
+                  background 0.3s ease;
+    }
+    .folder-item:last-child {
+      border-bottom: none;
     }
     .folder-item.visible {
       opacity: 1;
       transform: translateY(0);
     }
-    .folder-item:last-child {
-      border-bottom: none;
+    .folder-item.open {
+      background: #ffffff;
     }
     .folder-item.folder-dim {
-      opacity: 0.12;
+      opacity: 0.1 !important;
       pointer-events: none;
     }
-    .folder-item.folder-highlight > .folder-tab .folder-tab-title {
-      color: var(--black);
+    .folder-item.folder-highlight {
+      background: #e8e8e8;
     }
 
+    /* Tab row — number | title+sub | leader | arrow */
     .folder-tab {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 17px 24px;
+      gap: 0;
+      padding: 14px 20px 14px 18px;
       cursor: pointer;
       user-select: none;
-      transition: background 0.2s ease;
+    }
+    .folder-tab-num {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: #aaa;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      width: 28px;
+      padding-top: 1px;
     }
     .folder-tab-left {
       display: flex;
       flex-direction: column;
       min-width: 0;
+      flex-shrink: 0;
     }
-    .folder-tab:hover {
-      background: rgba(0,0,0,0.025);
+    .folder-tab-leader {
+      flex: 1;
+      margin: 0 14px;
+      border-bottom: 1px dotted #ccc;
+      align-self: center;
+      margin-bottom: 3px;
     }
-    .folder-item.open > .folder-tab {
-      background: rgba(0,0,0,0.02);
-    }
-
     .folder-tab-title {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: var(--black);
+      color: #1a1a1a;
+      line-height: 1.2;
     }
     .folder-tab-sub {
-      font-size: 10.5px;
+      font-size: 9.5px;
       font-weight: 400;
-      letter-spacing: 0.02em;
-      color: var(--dim);
-      margin-top: 2px;
+      color: #999;
+      margin-top: 3px;
+      letter-spacing: 0.01em;
       text-transform: none;
     }
     .folder-tab-arrow {
       flex-shrink: 0;
-      color: var(--line);
-      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+      color: #ccc;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
       display: flex;
       align-items: center;
     }
     .folder-item.open .folder-tab-arrow {
       transform: rotate(180deg);
-      color: var(--dim);
+      color: #888;
     }
 
+    /* Expanded content */
     .folder-content {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .folder-item.open .folder-content {
-      max-height: 900px;
+      max-height: 1000px;
     }
-
     .folder-inner {
-      padding: 0 24px 24px;
-      border-top: 1px solid var(--line);
+      padding: 0 20px 22px 46px;
+      border-top: 1px solid #d4d4d4;
     }
 
     .folder-thumb {
       aspect-ratio: 16 / 9;
-      border-radius: 10px;
+      border-radius: 3px;
       overflow: hidden;
-      margin: 18px 0 14px;
+      margin: 16px 0 12px;
       cursor: pointer;
     }
     .folder-thumb img {
@@ -848,7 +872,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.5s ease;
+      transition: transform 0.55s ease;
     }
     .folder-thumb:hover img {
       transform: scale(1.03);
@@ -858,56 +882,60 @@
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
-      margin-bottom: 14px;
+      margin-bottom: 13px;
     }
     .folder-tags .fc-tag {
-      font-size: 9px;
-      padding: 3px 8px;
+      font-size: 8.5px;
+      padding: 2px 7px;
+      border-color: #ccc;
+      color: #888;
+      letter-spacing: 0.08em;
     }
 
     .folder-desc {
-      font-size: 12.5px;
-      line-height: 1.75;
-      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      color: #777;
     }
 
     .folder-open-cta {
-      margin-top: 14px;
-      font-size: 9px;
+      margin-top: 13px;
+      font-size: 8.5px;
       font-weight: 500;
       letter-spacing: 0.10em;
       text-transform: uppercase;
-      color: var(--line);
+      color: #ccc;
     }
 
+    /* Artist bubbles */
     .folder-artists {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid #d4d4d4;
     }
     .folder-artist-bubble {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       cursor: pointer;
     }
     .folder-artist-avatar {
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       overflow: hidden;
-      border: 1px solid var(--line);
-      background: #f0f0f0;
+      border: 1px solid #d4d4d4;
+      background: #e4e4e4;
       flex-shrink: 0;
       transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
     .folder-artist-bubble:hover .folder-artist-avatar {
-      transform: scale(1.08);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      transform: scale(1.1);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
     }
     .folder-artist-avatar img {
       width: 100%;
@@ -921,14 +949,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
-      color: var(--dim);
+      color: #999;
     }
     .folder-artist-name {
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 400;
-      color: var(--muted);
+      color: #999;
       white-space: nowrap;
     }
 
@@ -941,8 +969,29 @@
       /* Shrink logo so orbit has room */
       .stage-logo img { height: 60px; }
 
-      /* Search bar fills available width */
-      .search-wrap { width: calc(100vw - 40px); max-width: 310px; }
+      /* Hide desktop side arrows, show inline mobile arrows */
+      .stage-arrow { display: none !important; }
+      .stage-arrow-mob {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        background: none;
+        border: 1px solid rgba(0,0,0,0.12);
+        border-radius: 50%;
+        cursor: pointer;
+        color: rgba(0,0,0,0.3);
+        padding: 0;
+        transition: border-color 0.2s ease, color 0.2s ease;
+      }
+      .stage-arrow-mob:hover {
+        border-color: rgba(0,0,0,0.28);
+        color: rgba(0,0,0,0.65);
+      }
+      /* Shorten search bar to fit the arrows on either side */
+      .search-wrap { width: calc(100vw - 40px - 88px); max-width: 220px; }
 
       /* Hide ghost and outer-ring cards — too cluttered at small sizes */
       .ghost-card       { display: none !important; }
@@ -958,12 +1007,13 @@
       /* Footer stays readable */
       .footer-strip { padding: 0 14px; }
 
-      /* Folder database on mobile */
+      /* Folder catalog on mobile */
       .projects-section { padding: 100px 16px 80px; }
-      .folders-wrap { border-radius: 14px; }
-      .folder-tab { padding: 15px 18px; }
-      .folder-tab-title { font-size: 12px; }
-      .folder-inner { padding: 0 16px 20px; }
+      .folders-wrap { border-radius: 3px; }
+      .folder-tab { padding: 13px 16px 13px 14px; }
+      .folder-tab-num { width: 22px; font-size: 9px; }
+      .folder-inner { padding: 0 14px 18px 36px; }
+      .folder-artist-name { display: none; }
     }
 
   </style>
@@ -990,20 +1040,34 @@
         <img src="logo/I-logo.png" alt="I" />
       </div>
 
-      <!-- Search bar -->
-      <div class="search-wrap">
-        <svg class="search-icon" viewBox="0 0 16 16" fill="none"
-             stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-          <circle cx="6.5" cy="6.5" r="4.5"/>
-          <line x1="10.2" y1="10.2" x2="14" y2="14"/>
-        </svg>
-        <input
-          class="search-input"
-          type="text"
-          id="searchInput"
-          placeholder="Search works, artists, titles..."
-          autocomplete="off"
-        />
+      <!-- Search bar (wrapped with mobile arrows) -->
+      <div class="search-row">
+        <button class="stage-arrow-mob" id="arrowLeftMob" aria-label="Previous projects">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M8 2L4 6.5 8 11" stroke="currentColor" stroke-width="1.2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 16 16" fill="none"
+               stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <circle cx="6.5" cy="6.5" r="4.5"/>
+            <line x1="10.2" y1="10.2" x2="14" y2="14"/>
+          </svg>
+          <input
+            class="search-input"
+            type="text"
+            id="searchInput"
+            placeholder="Search works, artists, titles..."
+            autocomplete="off"
+          />
+        </div>
+        <button class="stage-arrow-mob" id="arrowRightMob" aria-label="Next projects">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M5 2l4 4.5-4 4.5" stroke="currentColor" stroke-width="1.2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
 
       <!-- MDW Logo -->
@@ -1346,8 +1410,10 @@
         }, 350 + i * 130);
       });
     }
-    document.getElementById('arrowLeft').addEventListener('click',  () => cycleFG(-1));
-    document.getElementById('arrowRight').addEventListener('click', () => cycleFG(1));
+    document.getElementById('arrowLeft').addEventListener('click',     () => cycleFG(-1));
+    document.getElementById('arrowRight').addEventListener('click',    () => cycleFG(1));
+    document.getElementById('arrowLeftMob').addEventListener('click',  () => cycleFG(-1));
+    document.getElementById('arrowRightMob').addEventListener('click', () => cycleFG(1));
 
     /* Reposition on viewport resize */
     window.addEventListener('resize', () => {
@@ -1426,12 +1492,16 @@
           ? proj.artists.map(a => a.name).join(', ')
           : (proj.student || '');
 
+        const num = String(idx + 1).padStart(2, '0');
+
         item.innerHTML = `
           <div class="folder-tab">
+            <span class="folder-tab-num">${num}</span>
             <div class="folder-tab-left">
               <div class="folder-tab-title">${proj.title}</div>
               ${artistNames ? `<div class="folder-tab-sub">${artistNames}</div>` : ''}
             </div>
+            <div class="folder-tab-leader"></div>
             <span class="folder-tab-arrow">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="2"
@@ -1505,26 +1575,20 @@
       io.observe(wrap);
     })();
 
-    /* ── Search — filters folders ── */
+    /* ── Search — filters foreground floating cards only ── */
     const searchInput = document.getElementById('searchInput');
 
     function applySearch() {
       const q = searchInput.value.trim().toLowerCase();
-      document.querySelectorAll('.folder-item').forEach(item => {
+      cards.forEach(card => {
         if (!q) {
-          item.classList.remove('folder-dim', 'folder-highlight');
+          card.classList.remove('card-dim', 'card-highlight');
           return;
         }
-        const hit = (item.dataset.search || '').toLowerCase().includes(q);
-        item.classList.toggle('folder-highlight', hit);
-        item.classList.toggle('folder-dim', !hit);
-        /* Auto-open the first matching folder */
-        if (hit && !item.classList.contains('open')) {
-          const firstMatch = document.querySelector('.folder-item.folder-highlight');
-          if (firstMatch === item) item.classList.add('open');
-        }
+        const hit = (card.dataset.search || '').toLowerCase().includes(q);
+        card.classList.toggle('card-highlight', hit);
+        card.classList.toggle('card-dim', !hit);
       });
-      if (q) document.querySelector('.projects-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     searchInput.addEventListener('input', applySearch);
